@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "oazxgaaRzwM=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\atlee\\Documents\\C# Projects\\MiningGame\\MiningGame\\MiningGame.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\atlee\\.nuget\\packages\\raylib-cs\\7.0.1\\raylib-cs.7.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
