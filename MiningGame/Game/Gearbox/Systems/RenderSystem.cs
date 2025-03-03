@@ -23,7 +23,7 @@ namespace Graphics
 
         List<IRendable> allRenderObjects = new();
 
-        public override void OnSystemStart()
+        public override void Start()
         {
             //set all window things
             System.Console.WriteLine("Innit window");
@@ -40,7 +40,7 @@ namespace Graphics
             target = Raylib.LoadRenderTexture(WindowSettings.gameScreenWidth, WindowSettings.gameScreenHeight);
             SetValuesOfWindow();
         }
-        public override void OnSystemUpdate(float delta)
+        public override void Update(float delta)
         {
             //If window is change recalc all window values
             if (Raylib.IsWindowResized())

@@ -9,7 +9,7 @@ namespace CoreEngine
     public class ScriptSystem : GameSystem
     {
         //Give all IScript a proper start function
-        public override void OnSystemStart()
+        public override void Start()
         {
             foreach (GameEntity gameEntity in Core.activeGameEntities)
             {
@@ -17,13 +17,13 @@ namespace CoreEngine
                 {
                     if (component is IScript)
                     {
-                        component.OnStart();
+                        component.Start();
                     }
                 }
             }
         }
         //Give all IScript a proper update function
-        public override void OnSystemUpdate(float delta)
+        public override void Update(float delta)
         {
             foreach (GameEntity gameEntity in Core.gameEntities)
             {
@@ -31,7 +31,7 @@ namespace CoreEngine
                 {
                     if (component is IScript)
                     {
-                        component.OnUpdate(delta);
+                        component.Update(delta);
                     }
                 }
             }

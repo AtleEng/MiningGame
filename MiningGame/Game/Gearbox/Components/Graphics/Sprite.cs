@@ -51,8 +51,8 @@ namespace Engine
         public void Render()//What the sprite render call
         {
             // Get the screen position/size from the sprites world position/size
-            Vector2 p = WorldSpace.ConvertToCameraPosition(entity.transform.worldPosition);
-            Vector2 s = WorldSpace.ConvertToCameraSize(entity.transform.worldSize);
+            Vector2 p = WorldSpace.ConvertToCameraPosition(gameEntity.transform.worldPosition);
+            Vector2 s = WorldSpace.ConvertToCameraSize(gameEntity.transform.worldSize);
 
             //Calculate rectangle the sprite is rendered in from p and s
             Rectangle destRec = new Rectangle(

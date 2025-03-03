@@ -7,7 +7,7 @@ namespace Animation
     //System that handels frame by frame animations
     public class AnimationSystem : GameSystem
     {
-        public override void OnSystemUpdate(float delta)
+        public override void Update(float delta)
         {
             foreach (GameEntity gameEntity in Core.activeGameEntities) //loop thruogh all active entitys
             {

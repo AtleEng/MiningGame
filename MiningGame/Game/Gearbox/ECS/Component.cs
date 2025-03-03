@@ -8,13 +8,13 @@ namespace Engine
     //The class that handles components
     public abstract class Component
     {
-        //the attached component's entity
-        public Entity? entity;
+        //the attach components gameEntity
+        public GameEntity gameEntity = new();
 
         //When entity spawns
-        public virtual void OnStart() { }
+        public virtual void Start() { }
         //Every frame
-        public virtual void OnUpdate(float delta) { }
+        public virtual void Update(float delta) { }
         //Before entity is destroyed
         public virtual void OnDestroy() { }
         //If entity has a trigger collider and it is triggered

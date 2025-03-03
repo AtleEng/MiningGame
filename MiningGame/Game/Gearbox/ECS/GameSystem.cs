@@ -1,10 +1,15 @@
+using System.Collections.Generic;
+using System.Numerics;
+using Engine;
+using Physics;
+
 namespace Engine
 {
     public abstract class GameSystem
     {
-        public List<Component> validComponents = new(); //Doesn't have a use right now
-        public virtual void OnSystemStart() { } //Start of system
-        public virtual void OnSystemUpdate(float delta) { } //Updates every frame
+        public List<Component> validComponents = new(); //Doesnt have a use right now
+        public virtual void Start() { } //Start of system
+        public virtual void Update(float delta) { } //Updates every frame
     }
-    public interface IScript { } // Infterface for scriptes
+    public interface IScript { } // Infterface for scriptes (has atomatic update update)
 }

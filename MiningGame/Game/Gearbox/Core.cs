@@ -15,7 +15,7 @@ namespace CoreEngine
     public static class Core
     {
         //All entitys in scene in child of this
-        public static GameEntity rotEntity = new();
+        public static GameEntity rotEntity = new GameEntity();
         public static bool shouldClose; //If true the program closes
 
         static public List<GameEntity> gameEntities = new(); //All gameEntitys
@@ -40,10 +40,10 @@ namespace CoreEngine
             AddSystem<RenderSystem>();
 
             //* Innit all the systems in the right order
-            systems[systems.Count - 1].OnSystemStart(); //Start the render system first
+            systems[systems.Count - 1].Start(); //Start the render system first
             for (int i = 0; i < systems.Count - 1; i++)
             {
-                systems[i].OnSystemStart();
+                systems[i].Start();
             }
             //Audio
             Raylib.InitAudioDevice();
@@ -74,7 +74,7 @@ namespace CoreEngine
             {
                 if (!(delta > 0.02f && (i == 1 || i == 2)))
                 {
-                    systems[i].OnSystemUpdate(delta);
+                    systems[i].Update(delta);
                 }
             }
             UpdateChildren(rotEntity.transform); //Update all transforms
@@ -126,6 +126,7 @@ namespace CoreEngine
                 }
             }
         }
+
         //* For debugging
         static void PrintEntityTree(GameEntity entity, string layer = "", string space = "")
         {
@@ -147,7 +148,7 @@ namespace CoreEngine
                     PrintEntityTree(child.gameEntity, $"{layer}>", $"{space}| "); //reapetes until all children of scene are printed
                 }
             }
-            Console.WriteLine($"{space}<");
+            System.Console.WriteLine($"{space}<");
         }
         static void GetAllActiveEntities(GameEntity entity) //Get all entitys in gameEntitys with isActive == true
         {

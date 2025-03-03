@@ -1,0 +1,6 @@
+c:\Users\atlee\Documents\C# Projects\MiningGame\MiningGame\obj\Debug\net8.0\MiningGame.csproj.AssemblyReference.cache
+c:\Users\atlee\Documents\C# Projects\MiningGame\MiningGame\obj\Debug\net8.0\MiningGame.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\atlee\Documents\C# Projects\MiningGame\MiningGame\obj\Debug\net8.0\MiningGame.AssemblyInfoInputs.cache
+c:\Users\atlee\Documents\C# Projects\MiningGame\MiningGame\obj\Debug\net8.0\MiningGame.AssemblyInfo.cs
+c:\Users\atlee\Documents\C# Projects\MiningGame\MiningGame\obj\Debug\net8.0\MiningGame.csproj.CoreCompileInputs.cache
+c:\Users\atlee\Documents\C# Projects\MiningGame\MiningGame\obj\Debug\net8.0\MiningGame.sourcelink.json

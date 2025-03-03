@@ -6,24 +6,24 @@ namespace Physics
     //Component used to add physics to gameEntity, also makes it possible to interact by collision
     public class PhysicsBody : Component
     {
-        //dynamic => moving objects, static => triggers (Fixed objects doesnt need a physicsBody)
+        //dynamic => moving objects, static => triggers (walls and still blocks dosnt need a physicsBody)
         public PhysicsType physicsType = PhysicsType.dynamicType;
 
-        //How much force impact the object (Dosnt work with collision right now)
+        //How much force impact object (Dosnt work with collision right now)
         public float mass = 1;
 
-        //Speed and direction of object
+        //Speed and direction of the body
         public Vector2 velocity = Vector2.Zero;
         //How much the speed increses
         public Vector2 acceleration = Vector2.Zero;
 
-        //Controls drag
+        //how much the body is slowed down
         public float dragX = 0f;
         public float dragY = 0f;
 
-        //How much velocity is retain per bounce 0-1
+        //How much velocity is retain per bounce
         public float elasticity = 0f;
-        //Constant acceleration in a direction
+        //Acceleration in a direction (Default mimics earths)
         public Vector2 Gravity = new Vector2(0, 9.82f);
 
         //add a force to entity
@@ -37,10 +37,10 @@ namespace Physics
         {
             return $"Velocity: {velocity}, Mass: {mass} Drag: {dragX}, {dragY}, Elasticity: {elasticity}";
         }
-        
+
         public enum PhysicsType
         {
-            dynamicType, KinematicType
+            dynamicType, staticType
         }
     }
 }

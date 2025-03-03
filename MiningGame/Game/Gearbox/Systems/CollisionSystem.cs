@@ -8,7 +8,7 @@ namespace Physics
     //system that handle collision
     public class CollisionSystem : GameSystem
     {
-        public override void OnSystemUpdate(float delta)
+        public override void Update(float delta)
         {
             //* set all colliders isColliding to false 
             foreach (GameEntity gameEntity in Core.activeGameEntities)//loop thruogh all active entitys
@@ -34,7 +34,7 @@ namespace Physics
                         //Solve the collision between all the colliders that collide with this collider
                         SolveCollision(colliders, physicsBody, collider);
                         //Update transform
-                        Core.UpdateChildren(physicsBody.entity.transform.parent);
+                        Core.UpdateChildren(physicsBody.gameEntity.transform.parent);
                     }
                 }
             }
@@ -48,7 +48,7 @@ namespace Physics
 
             foreach (GameEntity otherGameEntity in Core.activeGameEntities) //loop all entitys
             {
-                if (otherGameEntity != collider.entity) //if not the same entity
+                if (otherGameEntity != collider.gameEntity) //if not the same entity
                 {
                     Collider? otherCollider = otherGameEntity.GetComponent<Collider>(); //Get its collider
                     if (otherCollider != null)
@@ -67,11 +67,11 @@ namespace Physics
                                 //If a collider is trigger call OnTrigger else and if it has physics OnCollision
                                 if (collider.isTrigger || otherCollider.isTrigger)
                                 {
-                                    collider.entity.OnTrigger(otherCollider);
+                                    collider.gameEntity.OnTrigger(otherCollider);
                                 }
                                 else if (physicsBody != null)
                                 {
-                                    collider.entity.OnCollision(otherCollider);
+                                    collider.gameEntity.OnCollision(otherCollider);
                                     collidersAndArea.Add(new(otherCollider, area)); //Add in turple list for the solver to use
                                 }
                             }
@@ -97,7 +97,7 @@ namespace Physics
                     int dir = Math.Sign(physicsBody.velocity.X); //find dir
                     if (aabb.X < otherAabb.X) //If aabb is right of otherAabb
                     {
-                        collider.entity.transform.position.X = otherAabb.X - aabb.Width / 2; //move aabb to correct position
+                        collider.gameEntity.transform.position.X = otherAabb.X - aabb.Width / 2; //move aabb to correct position
                         if (dir > 0)
                         {
                             physicsBody.velocity.X *= -dir * physicsBody.elasticity; //change velocity
@@ -105,7 +105,7 @@ namespace Physics
                     }
                     else //aabb is left of otherAabb (the same as above but left)
                     {
-                        collider.entity.transform.position.X = otherAabb.X + otherAabb.Width + aabb.Width / 2;
+                        collider.gameEntity.transform.position.X = otherAabb.X + otherAabb.Width + aabb.Width / 2;
                         if (dir < 0)
                         {
                             physicsBody.velocity.X *= dir * physicsBody.elasticity;
@@ -117,7 +117,7 @@ namespace Physics
                     int dir = Math.Sign(physicsBody.velocity.Y);
                     if (aabb.Y < otherAabb.Y)
                     {
-                        collider.entity.transform.position.Y = otherAabb.Y - aabb.Height / 2;
+                        collider.gameEntity.transform.position.Y = otherAabb.Y - aabb.Height / 2;
                         if (dir > 0)
                         {
                             physicsBody.velocity.Y *= -dir * physicsBody.elasticity;
@@ -125,24 +125,24 @@ namespace Physics
                     }
                     else
                     {
-                        collider.entity.transform.position.Y = otherAabb.Y + otherAabb.Height + aabb.Height / 2;
+                        collider.gameEntity.transform.position.Y = otherAabb.Y + otherAabb.Height + aabb.Height / 2;
                         if (dir < 0)
                         {
                             physicsBody.velocity.Y *= dir * physicsBody.elasticity;
                         }
                     }
                 }
-                Core.UpdateChildren(collider.entity.transform.parent); //update transform
+                Core.UpdateChildren(collider.gameEntity.transform.parent); //update transform
             }
         }
         Rectangle GetRectangleFromCollider(Collider collider) //Method that return world rect from collider component
         {
             return new Rectangle
             (
-                collider.entity.transform.worldPosition.X + collider.offset.X - collider.entity.transform.worldSize.X * collider.scale.X / 2,
-                collider.entity.transform.worldPosition.Y + collider.offset.Y - collider.entity.transform.worldSize.Y * collider.scale.Y / 2,
-                collider.entity.transform.worldSize.X * collider.scale.X,
-                collider.entity.transform.worldSize.Y * collider.scale.Y
+                collider.gameEntity.transform.worldPosition.X + collider.offset.X - collider.gameEntity.transform.worldSize.X * collider.scale.X / 2,
+                collider.gameEntity.transform.worldPosition.Y + collider.offset.Y - collider.gameEntity.transform.worldSize.Y * collider.scale.Y / 2,
+                collider.gameEntity.transform.worldSize.X * collider.scale.X,
+                collider.gameEntity.transform.worldSize.Y * collider.scale.Y
             );
         }
         List<Collider> SortOtherAabbsByArea(List<Tuple<Collider, float>> other) // sort colliders by its collision overlap area 

@@ -5,21 +5,38 @@ using Physics;
 
 namespace Engine
 {
-    public abstract class Entity
+    //The class that handle entitys
+    public class GameEntity
     {
         //name of gameEntity
         public string name { get; set; } = "GameEntity";
 
         //If isActive the gameEntity is being used in the systems
         public bool isActive { get; set; } = true;
-        //List of the entities components
+        //See Transform.cs
+        public Transform transform { get; set; } = new(null, new(), Vector2.Zero, Vector2.One);
+        //List of the entitys diffrent components
         public List<Component> components { get; set; } = new();
-        public virtual void OnInnit() { } //When spawned
-        public virtual string PrintStats()//Debug tree (Press F3)
+
+        public void OnTrigger(Collider other)//If entity has a trigger collider and it is triggered
         {
-            return $"";
+            foreach (Component component in components)
+            {
+                component.OnTrigger(other);
+            }
         }
-        #region ComponentsMethods
+        public void OnCollision(Collider other)//If entity has a collider and it is colliding
+        {
+            foreach (Component component in components)
+            {
+                component.OnCollision(other);
+            }
+        }
+        public virtual void OnInnit() { } //When spawned
+        public string PrintStats()//Debug tree (Press F3)
+        {
+            return $"isActive({isActive}) transform({transform.position},{transform.size})";
+        }
         public bool HasComponent<T>() where T : Component //Check if entity has a component of specified type
         {
             foreach (Component c in components)
@@ -87,7 +104,7 @@ namespace Engine
         }
         public void AddComponent<T>(Component component) where T : Component //method to add components to entity
         {
-            component.entity = this;
+            component.gameEntity = this;
             components.Add(component);
         }
         public void RemoveComponent<T>()//method to remove component from entity
@@ -100,45 +117,6 @@ namespace Engine
                     return;
                 }
             }
-        }
-        #endregion
-    }
-    //The class that handle gameEntitys
-    public class GameEntity : Entity
-    {
-        //See Transform.cs
-        public Transform transform { get; set; } = new(null, new(), Vector2.Zero, Vector2.One);
-        //List of the entitys diffrent components
-        public override string PrintStats()//Debug tree (Press F3)
-        {
-            return $"isActive({isActive}) transform({transform.position},{transform.size})";
-        }
-        public void OnTrigger(Collider other)//If entity has a trigger collider and overlap
-        {
-            foreach (Component component in components)
-            {
-                component.OnTrigger(other);
-            }
-        }
-        public void OnCollision(Collider other)//If entity has a collider and collide
-        {
-            foreach (Component component in components)
-            {
-                component.OnCollision(other);
-            }
-        }
-
-    }
-
-    //The class that handle UIentitys
-    public class UIEntity : Entity
-    {
-        //See Transform.cs
-        public UITransform transform { get; set; } = new(null, new(), Vector2.Zero, Vector2.One, new Vector2(0.5f,0.5f));
-        //List of the entitys diffrent components
-        public override string PrintStats()//Debug tree (Press F3)
-        {
-            return $"isActive({isActive}) transform({transform.position},{transform.size})";
         }
     }
 }

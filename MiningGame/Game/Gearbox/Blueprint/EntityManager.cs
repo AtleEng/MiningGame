@@ -8,6 +8,11 @@ namespace Engine
     //handles all entities for the components to use
     public static class EntityManager
     {
+        private static int nextId = 1;
+        // Stores components per entity using a dictionary keyed by type.
+        private static Dictionary<int, Dictionary<Type, object>> entities = new Dictionary<int, Dictionary<Type, object>>();
+
+       
         //Spaw in a entity in the world
         public static void SpawnEntity(GameEntity entity) { SpawnEntity(entity, Vector2.Zero); }
         public static void SpawnEntity(GameEntity entity, Vector2 position) { SpawnEntity(entity, position, Vector2.One); }
@@ -32,7 +37,11 @@ namespace Engine
             entity.OnInnit();
             foreach (Component component in entity.components)
             {
-                component.OnStart();
+                component.Start();
+            }
+            foreach (Transform child in entity.transform.children)
+            {
+                SpawnEntity(child.gameEntity, child.worldPosition, child.worldSize, entity.transform);
             }
             Core.entitiesToAdd.Add(entity);
         }

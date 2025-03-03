@@ -22,11 +22,11 @@ namespace UI
             OnKilcked = KlickAction;
             this.image = image;
         }
-        public override void OnUpdate(float delta)
+        public override void Update(float delta)
         {
              // Get the screen position/size from the sprites world position/size
-            Vector2 p = entity.transform.worldPosition;
-            Vector2 s = entity.transform.worldSize;
+            Vector2 p = gameEntity.transform.worldPosition;
+            Vector2 s = gameEntity.transform.worldSize;
 
             //Calculate rectangle the sprite is rendered in from p and s
             Rectangle destRec = new Rectangle(

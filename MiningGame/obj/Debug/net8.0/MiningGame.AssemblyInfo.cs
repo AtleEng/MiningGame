@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MiningGame")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+88cc096ad4fbcb5f31919fd5134f9366a9690a2f")]
 [assembly: System.Reflection.AssemblyProductAttribute("MiningGame")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MiningGame")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

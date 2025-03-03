@@ -21,14 +21,14 @@ namespace UI
         public void Render()//What the sprite render call
         {
             // Get the screen position/size from the sprites world position/size
-            Vector2 p = entity.transform.worldPosition;
-            Vector2 s = entity.transform.worldSize;
+            Vector2 p = gameEntity.transform.worldPosition;
+            Vector2 s = gameEntity.transform.worldSize;
 
             Raylib.DrawText(text, (int)p.X - (int)(s.X/2), (int)p.Y - (int)(s.Y/2), fontSize, color);
         }
         public override string PrintStats()//for debug parent tree (press F3)
         {
-            return $"Pos: {entity.transform.worldPosition}";
+            return $"Pos: {gameEntity.transform.worldPosition}";
         }
     }
 }

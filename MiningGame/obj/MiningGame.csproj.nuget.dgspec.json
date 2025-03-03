@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\atlee\\Documents\\C# Projects\\MiningGame\\MiningGame\\MiningGame.csproj": {}
+    "c:\\Users\\atlee\\Documents\\C# Projects\\MiningGame\\MiningGame\\MiningGame.csproj": {}
   },
   "projects": {
-    "C:\\Users\\atlee\\Documents\\C# Projects\\MiningGame\\MiningGame\\MiningGame.csproj": {
+    "c:\\Users\\atlee\\Documents\\C# Projects\\MiningGame\\MiningGame\\MiningGame.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\atlee\\Documents\\C# Projects\\MiningGame\\MiningGame\\MiningGame.csproj",
+        "projectUniqueName": "c:\\Users\\atlee\\Documents\\C# Projects\\MiningGame\\MiningGame\\MiningGame.csproj",
         "projectName": "MiningGame",
-        "projectPath": "C:\\Users\\atlee\\Documents\\C# Projects\\MiningGame\\MiningGame\\MiningGame.csproj",
+        "projectPath": "c:\\Users\\atlee\\Documents\\C# Projects\\MiningGame\\MiningGame\\MiningGame.csproj",
         "packagesPath": "C:\\Users\\atlee\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\atlee\\Documents\\C# Projects\\MiningGame\\MiningGame\\obj\\",
+        "outputPath": "c:\\Users\\atlee\\Documents\\C# Projects\\MiningGame\\MiningGame\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\atlee\\AppData\\Roaming\\NuGet\\NuGet.Config"

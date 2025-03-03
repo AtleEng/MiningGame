@@ -42,7 +42,7 @@ namespace Animation
                 currentFrame = 0;
                 timer = 0;
             }//else debug message
-            else { System.Console.WriteLine($"Animation {name} for {entity.name} doesn't exist!!!"); }
+            else { System.Console.WriteLine($"Animation {name} for {gameEntity.name} doesn't exist!!!"); }
         }
         public override string PrintStats() //for debug parent tree (press F3)
         {
