@@ -94,9 +94,11 @@ int main()
         // update
         platformUpdateWindow();
 
+        SM_LOG("Test", textColorBlue);
         SM_TRACE("Test");
         SM_WARN("Test");
         SM_ERROR("Test");
+        SM_ASSERT(false, "Assertion not hit");
     }
 
     return 0;
