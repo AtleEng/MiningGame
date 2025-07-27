@@ -1,4 +1,4 @@
-# Vaults Below (VIP)
+# Vaults Below (WIP)
 
 Dive down in a 2D platform roguelike with destructive terrain. Inspired by games like Noita and more.
 

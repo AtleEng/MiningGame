@@ -170,9 +170,9 @@ bool platformCreateWindow(int width, int height, char *title)
 
     const int pixelAttribs[] =
     {
-      WGL_DRAW_TO_WINDOW_ARB, 1,
-      WGL_SUPPORT_OPENGL_ARB, 1,
-      WGL_DOUBLE_BUFFER_ARB,  1,
+      WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+      WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+      WGL_DOUBLE_BUFFER_ARB,  GL_TRUE,
       WGL_SWAP_METHOD_ARB,    WGL_SWAP_COPY_ARB,
       WGL_PIXEL_TYPE_ARB,     WGL_TYPE_RGBA_ARB,
       WGL_ACCELERATION_ARB,   WGL_FULL_ACCELERATION_ARB,
@@ -241,13 +241,13 @@ void platformUpdateWindow()
     }
 }
 
-void *platform_load_gl_function(char *funcName)
+void *platform_load_gl_function(char *funName)
 {
-    PROC proc = wglGetProcAddress(funcName);
+    PROC proc = wglGetProcAddress(funName);
     if (!proc)
     {
         static HMODULE openglDLL = LoadLibraryA("opengl32.dll");
-        proc = GetProcAddress(openglDLL, funcName);
+        proc = GetProcAddress(openglDLL, funName);
         if (!proc)
         {
             SM_ASSERT(false, "Failed to load GL function %s", "glCreateProgram");
