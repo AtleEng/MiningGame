@@ -79,6 +79,12 @@ bool gl_init(BumpAllocator* transientStorage)
     glContext.programID = glCreateProgram();
     glAttachShader(glContext.programID, vertShaderID);
     glAttachShader(glContext.programID, fragShaderID);
+    glLinkProgram(glContext.programID);
+
+    glDetachShader(glContext.programID, vertShaderID);
+    glDetachShader(glContext.programID, fragShaderID);
+    glDeleteShader(vertShaderID);
+    glDeleteShader(fragShaderID);
 
     return true;
 }
