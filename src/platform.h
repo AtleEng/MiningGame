@@ -7,3 +7,4 @@ static bool running = true;
 bool platformCreateWindow(int width, int height, char *title);
 void platformUpdateWindow();
 void* platform_load_gl_function(char* funcName);
+void platform_swap_buffer();

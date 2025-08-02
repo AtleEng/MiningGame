@@ -1,4 +1,4 @@
-#include "gl_Renderer.h"
+#include "gl_renderer.h"
 
 // ################################     OpenGL Structs    ################################
 struct GLContext
@@ -86,5 +86,27 @@ bool gl_init(BumpAllocator* transientStorage)
     glDeleteShader(vertShaderID);
     glDeleteShader(fragShaderID);
 
+    //This has to be done so GL will draw
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    //Depth Testing
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_GREATER);
+
+    glUseProgram(glContext.programID);
+
     return true;
+}
+
+void gl_render()
+{
+    glClearColor(119.0f/255.0f, 33.0f/255.0f, 111.0f/255.0f, 1.0f);
+    glClearDepth(0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glViewport(0,0, input.screenSizeX, input.screenSizeY);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }

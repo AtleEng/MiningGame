@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glcorearb.h"
+#include "input.h"
 
 // #############################################################################
 //                           OpenGL Function Pointers
