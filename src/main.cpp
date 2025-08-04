@@ -1,5 +1,8 @@
 #include "vaultEngine_lib.h"
 #include "input.h"
+
+#include "game.cpp"
+
 #include "platform.h"
 
 #define APIENTRY
@@ -26,6 +29,7 @@ int main()
     {
         // update
         platformUpdateWindow();
+        updateGame();
         gl_render();
 
         platform_swap_buffer();
