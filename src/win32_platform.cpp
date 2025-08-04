@@ -28,8 +28,8 @@ LRESULT CALLBACK windowsWindowCallback(HWND window, UINT msg,
   {
     RECT rect = {};
     GetClientRect(window, &rect);
-    input.screenSizeX = rect.right - rect.left;
-    input.screenSizeY = rect.bottom - rect.top;
+    input->screenSizeX = rect.right - rect.left;
+    input->screenSizeY = rect.bottom - rect.top;
     break;
   }
   default:
@@ -38,7 +38,7 @@ LRESULT CALLBACK windowsWindowCallback(HWND window, UINT msg,
   return result;
 }
 
-bool platformCreateWindow(int width, int height, char *title)
+bool platform_create_window(int width, int height, char *title)
 {
   HINSTANCE instance = GetModuleHandleA(0);
 
@@ -74,14 +74,14 @@ bool platformCreateWindow(int width, int height, char *title)
                              NULL); // lpParam
     if (window == NULL)
     {
-      SM_ASSERT(false, "Failed to create Windows Window")
+      SM_ERROR("Failed to create Windows Window")
       return false;
     }
 
     HDC fakeDC = GetDC(window);
     if (!fakeDC)
     {
-      SM_ASSERT(false, "Falied to get HDC");
+      SM_ERROR("Falied to get HDC");
       return false;
     }
 
@@ -97,12 +97,12 @@ bool platformCreateWindow(int width, int height, char *title)
     int pixelFormat = ChoosePixelFormat(fakeDC, &pfd);
     if (!pixelFormat)
     {
-      SM_ASSERT(false, "Failed to choose pixel format");
+      SM_ERROR("Failed to choose pixel format");
       return false;
     }
     if (!SetPixelFormat(fakeDC, pixelFormat, &pfd))
     {
-      SM_ASSERT(false, "Failed to set pixel format");
+      SM_ERROR("Failed to set pixel format");
       return false;
     }
 
@@ -111,12 +111,12 @@ bool platformCreateWindow(int width, int height, char *title)
 
     if (!fakeRC)
     {
-      SM_ASSERT(false, "Failed to create Render Context");
+      SM_ERROR("Failed to create Render Context");
       return false;
     }
     if (!wglMakeCurrent(fakeDC, fakeRC))
     {
-      SM_ASSERT(false, "Failed to make current");
+      SM_ERROR("Failed to make current");
       return false;
     }
     wglChoosePixelFormatARB =
@@ -128,7 +128,7 @@ bool platformCreateWindow(int width, int height, char *title)
 
     if (!wglCreateContextAttribsARB || !wglChoosePixelFormatARB)
     {
-      SM_ASSERT(false, "Failed to load OpenGL functions");
+      SM_ERROR("Failed to load OpenGL functions");
       return false;
     }
 
@@ -166,14 +166,14 @@ bool platformCreateWindow(int width, int height, char *title)
 
     if (window == NULL)
     {
-      SM_ASSERT(false, "Failed to create Windows Window");
+      SM_ERROR("Failed to create Windows Window");
       return false;
     }
 
     dc = GetDC(window);
     if (!dc)
     {
-      SM_ASSERT(false, "Failed to get DC");
+      SM_ERROR("Failed to get DC");
       return false;
     }
 
@@ -199,7 +199,7 @@ bool platformCreateWindow(int width, int height, char *title)
                                  &pixelFormat,
                                  &numPixelFormats))
     {
-      SM_ASSERT(0, "Failed to wglChoosePixelFormatARB");
+      SM_ERROR("Failed to wglChoosePixelFormatARB");
       return false;
     }
 
@@ -208,7 +208,7 @@ bool platformCreateWindow(int width, int height, char *title)
 
     if (!SetPixelFormat(dc, pixelFormat, &pfd))
     {
-      SM_ASSERT(0, "Failed to SetPixelFormat");
+      SM_ERROR("Failed to SetPixelFormat");
       return true;
     }
 
@@ -224,13 +224,13 @@ bool platformCreateWindow(int width, int height, char *title)
     HGLRC rc = wglCreateContextAttribsARB(dc, 0, contextAttribs);
     if (!rc)
     {
-      SM_ASSERT(0, "Failed to crate Render Context for OpenGL");
+      SM_ERROR("Failed to crate Render Context for OpenGL");
       return false;
     }
 
     if (!wglMakeCurrent(dc, rc))
     {
-      SM_ASSERT(0, "Faield to wglMakeCurrent");
+      SM_ERROR("Faield to wglMakeCurrent");
       return false;
     }
   }
@@ -239,7 +239,7 @@ bool platformCreateWindow(int width, int height, char *title)
   return true;
 }
 
-void platformUpdateWindow()
+void platform_update_window()
 {
   MSG msg;
 
@@ -259,7 +259,7 @@ void *platform_load_gl_function(char *funName)
     proc = GetProcAddress(openglDLL, funName);
     if (!proc)
     {
-      SM_ASSERT(false, "Failed to load GL function %s", "glCreateProgram");
+      SM_ERROR("Failed to load GL function %s", "glCreateProgram");
       return nullptr;
     }
   }
@@ -267,7 +267,30 @@ void *platform_load_gl_function(char *funName)
   return (void *)proc;
 }
 
-void platform_swap_buffer()
+void platform_swap_buffers()
 {
   SwapBuffers(dc);
+}
+
+void *platform_load_dynamic_library(const char *dll)
+{
+  HMODULE result = LoadLibraryA(dll);
+  SM_ASSERT(result, "Failed to load dll: %s", dll)
+  return result;
+}
+
+void *platform_load_dynamic_function(void *dll, const char *funName)
+{
+  FARPROC proc = GetProcAddress((HMODULE)dll, funName);
+  SM_ASSERT(proc, "Failed to load function: %s from DLL", funName);
+
+  return (void*)proc;
+}
+
+bool platform_free_dynamic_library(void *dll)
+{
+  BOOL freeResult = FreeLibrary((HMODULE)dll);
+  SM_ASSERT(freeResult, "Failed to free lib");
+
+  return (bool) freeResult;
 }

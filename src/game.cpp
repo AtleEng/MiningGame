@@ -1,6 +1,6 @@
+#include "game.h"
+
 #include "assets.h"
-#include "render_interface.h"
-#include "vaultEngine_lib.h"
 
 // ################################     Game Constants   ################################
 
@@ -8,8 +8,14 @@
 
 // ################################     Game Functions   ################################
 
-void updateGame()
+EXPORT_FN void update_game(RenderData* renderDataIn, Input* inputIn)
 {
+    if(renderData != renderDataIn)
+    {
+        renderData = renderDataIn;
+        input = inputIn;
+    }
+
     for (int x = 0; x < 10; x++)
     {
         for (int y = 0; y < 10; y++)

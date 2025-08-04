@@ -8,6 +8,7 @@
 // ################################     Defines    ################################
 #ifdef _WIN32
 #define DEBUG_BREAK() __debugbreak()
+#define EXPORT_FN __declspec(dllexport)
 #elif __linux__
 #define DEBUG_BREAK() __builtin_debugtrap()
 #elif __APPLE__
@@ -94,7 +95,7 @@ struct BumpAllocator
   char *memory;
 };
 
-BumpAllocator makeBumpAllocator(size_t size)
+BumpAllocator make_bump_allocator(size_t size)
 {
   BumpAllocator ba = {};
 
@@ -111,7 +112,7 @@ BumpAllocator makeBumpAllocator(size_t size)
   return ba;
 }
 
-char *bumpAlloc(BumpAllocator *bumpAllocator, size_t size)
+char *bump_alloc(BumpAllocator *bumpAllocator, size_t size)
 {
   char *result = nullptr;
 
@@ -208,7 +209,7 @@ char* read_file(const char* filePath, int* fileSize, BumpAllocator* bumpAllocato
 
   if(fileSize2)
   {
-    char* buffer = bumpAlloc(bumpAllocator, fileSize2 + 1);
+    char* buffer = bump_alloc(bumpAllocator, fileSize2 + 1);
 
     file = read_file(filePath, fileSize, buffer);
   }
@@ -262,7 +263,7 @@ bool copy_file(const char* fileName, const char* outputName, BumpAllocator* bump
 
   if(fileSize2)
   {
-    char* buffer = bumpAlloc(bumpAllocator, fileSize2 + 1);
+    char* buffer = bump_alloc(bumpAllocator, fileSize2 + 1);
 
     return copy_file(fileName, outputName, buffer);
   }

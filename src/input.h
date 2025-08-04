@@ -10,4 +10,4 @@ struct Input
 };
 
 // ################################     Input Globals    ################################
-static Input input;
+static Input* input;
