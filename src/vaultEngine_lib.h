@@ -72,7 +72,7 @@ void _log(char *prefix, char *msg, TextColor textColor, Args... args)
   puts(textBuffer);
 }
 
-#define SM_LOG(msg, textColor, ...) _log("LOG: ", msg, textColor, ##__VA_ARGS__);
+#define SM_LOG(msg, textColor, ...) _log("", msg, textColor, ##__VA_ARGS__);
 #define SM_TRACE(msg, ...) _log("TRACE: ", msg, textColorGreen, ##__VA_ARGS__);
 #define SM_WARN(msg, ...) _log("WARN: ", msg, textColorYellow, ##__VA_ARGS__);
 #define SM_ERROR(msg, ...) _log("ERROR: ", msg, textColorRed, ##__VA_ARGS__);
@@ -277,9 +277,111 @@ struct Vec2
 {
   float x;
   float y;
+  Vec2 operator/(float scalar)
+  {
+    return {x / scalar, y / scalar};
+  }
+
+  Vec2 operator*(float scalar)
+  {
+    return {x * scalar, y * scalar};
+  }
+
+  Vec2 operator-(Vec2 other)
+  {
+    return {x - other.x, y - other.y};
+  }
+
+  operator bool()
+  {
+    return x != 0.0f && y != 0.0f;
+  }
 };
 struct IVec2
 {
   int x;
   int y;
 };
+Vec2 vec_2(IVec2 v)
+{
+  return Vec2{(float)v.x, (float)v.y};
+}
+struct Vec4
+{
+  union
+  {
+    float values[4];
+    struct
+    {
+      float x;
+      float y;
+      float z;
+      float w;
+    };
+    
+    struct
+    {
+      float r;
+      float g;
+      float b;
+      float a;
+    };
+  };
+  float& operator[](int idx)
+  {
+    return values[idx];
+  }
+
+  bool operator==(Vec4 other)
+  {
+    return x == other.x && y == other.y && z == other.z && w == other.w;
+  }
+};
+struct Mat4
+{
+  union 
+  {
+    Vec4 values[4];
+    struct
+    {
+      float ax;
+      float bx;
+      float cx;
+      float dx;
+
+      float ay;
+      float by;
+      float cy;
+      float dy;
+
+      float az;
+      float bz;
+      float cz;
+      float dz;
+      
+      float aw;
+      float bw;
+      float cw;
+      float dw;
+    };
+  };
+  Vec4& operator[](int col)
+  {
+    return values[col];
+  }
+};
+
+Mat4 orthographic_projection(float left, float right, float top, float bottom)
+{
+  Mat4 result = {};
+  result.aw = -(right + left) / (right - left);
+  result.bw = (top + bottom) / (top - bottom);
+  result.cw = 0.0f; // Near Plane
+  result[0][0] = 2.0f / (right - left);
+  result[1][1] = 2.0f / (top - bottom); 
+  result[2][2] = 1.0f / (1.0f - 0.0f); // Far and Near
+  result[3][3] = 1.0f;
+
+  return result;
+}
+

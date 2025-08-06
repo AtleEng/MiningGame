@@ -7,6 +7,12 @@
 constexpr int MAX_TRANSFORMS = 1000;
 
 // ################################     Render Structs   ################################
+struct OrthographicCamera2D
+{
+    float zoom = 1.0f;
+    Vec2 dimensions;
+    Vec2 position;
+};
 struct Transform
 {
     Vec2 pos;
@@ -17,6 +23,9 @@ struct Transform
 
 struct RenderData
 {
+    OrthographicCamera2D gameCamera;
+    OrthographicCamera2D uiCamera;
+
     int transformCount;
     Transform transforms[MAX_TRANSFORMS];
 };
@@ -25,13 +34,13 @@ struct RenderData
 static RenderData* renderData;
 
 // ################################     Render Functions   ################################
-void draw_sprite(SpriteID spriteID, Vec2 pos, Vec2 size)
+void draw_sprite(SpriteID spriteID, Vec2 pos)
 {
     Sprite sprite = get_sprite(spriteID);
 
     Transform transform = {};
-    transform.pos = pos;
-    transform.size = size;
+    transform.pos = pos - vec_2(sprite.spriteSize) / 2.0f;
+    transform.size = vec_2(sprite.spriteSize);
     transform.atlasOffset = sprite.atlasOffset;
     transform.spriteSize = sprite.spriteSize;
 

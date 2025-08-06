@@ -7,7 +7,7 @@
 #include "render_interface.h"
 
 // ################################     OpenGL Constants    ################################
-const char* TEXTURE_PATH = "assets/textures/Texture_Atlas.png";
+const char *TEXTURE_PATH = "assets/textures/Texture_Atlas.png";
 
 // ################################     OpenGL Structs    ################################
 struct GLContext
@@ -16,6 +16,7 @@ struct GLContext
     GLuint textureID;
     GLuint transformSBOID;
     GLuint screenSizeID;
+    GLuint orthoProjectionID;
 };
 // ################################     OpenGL Globals    ################################
 static GLContext glContext;
@@ -141,9 +142,10 @@ bool gl_init(BumpAllocator *transientStorage)
                      renderData->transforms, GL_DYNAMIC_DRAW);
     }
 
-    //Uniforms
+    // Uniforms
     {
         glContext.screenSizeID = glGetUniformLocation(glContext.programID, "screenSize");
+        glContext.orthoProjectionID = glGetUniformLocation(glContext.programID, "orthoProjection");
     }
 
     // Tell GPU to use sRGB (otherwise color may be incorrect)
@@ -165,19 +167,33 @@ void gl_render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, input->screenSizeX, input->screenSizeY);
 
-    //copy screen size to the GPU
+    // copy screen size to the GPU
     Vec2 screenSize = {(float)input->screenSizeX, (float)input->screenSizeY};
     glUniform2fv(glContext.screenSizeID, 1, &screenSize.x);
 
+
+
+    // Game Orthographic Projection
+    {
+        OrthographicCamera2D camera = renderData->gameCamera;
+        Mat4 orthoProjection = orthographic_projection(camera.position.x - camera.dimensions.x / 2.0f,
+                                                       camera.position.x + camera.dimensions.x / 2.0f,
+                                                       camera.position.y - camera.dimensions.y / 2.0f,
+                                                       camera.position.y + camera.dimensions.y / 2.0f);
+        glUniformMatrix4fv(glContext.orthoProjectionID, 1, GL_FALSE, &orthoProjection.ax);
+    }
+
+
+    
     // Opaque Object
     {
         // Copy transform to the GPU
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Transform) * renderData->transformCount,
                         renderData->transforms);
-        
+
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderData->transformCount);
 
-        //restet for next frame
+        // restet for next frame
         renderData->transformCount = 0;
     }
 }
