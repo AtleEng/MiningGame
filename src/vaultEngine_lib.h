@@ -1,8 +1,8 @@
 #pragma once
 
 #include <stdio.h>
-#include <stdlib.h> //malloc
-#include <string.h> //memset
+#include <stdlib.h>   //malloc
+#include <string.h>   //memset
 #include <sys/stat.h> //edit timestamp of files
 
 // ################################     Defines    ################################
@@ -89,6 +89,46 @@ void _log(char *prefix, char *msg, TextColor textColor, Args... args)
     }                               \
   }
 
+// ################################     Array    ################################
+template <typename T, int N>
+struct Array
+{
+  static constexpr int maxElements = N;
+  int count = 0;
+  T elements[N];
+
+  T &operator[](int idx)
+  {
+    SM_ASSERT(idx >= 0, "idx negative!");
+    SM_ASSERT(idx < count, "Idx out of bounds!");
+    return elements[idx];
+  }
+
+  int add(T element)
+  {
+    SM_ASSERT(count < maxElements, "Array Full!");
+    elements[count] = element;
+    return count++;
+  }
+
+  void remove_idx_and_swap(int idx)
+  {
+    SM_ASSERT(idx >= 0, "idx negative!");
+    SM_ASSERT(idx < count, "idx out of bounds!");
+    elements[idx] = elements[--count];
+  }
+
+  void clear()
+  {
+    count = 0;
+  }
+
+  bool is_full()
+  {
+    return count == N;
+  }
+};
+
 // ################################     BumpAllocator    ################################
 struct BumpAllocator
 {
@@ -132,19 +172,19 @@ char *bump_alloc(BumpAllocator *bumpAllocator, size_t size)
 }
 
 // ################################     File I/O    ################################
-long long get_timestamp(const char* file)
+long long get_timestamp(const char *file)
 {
   struct stat file_stat = {};
   stat(file, &file_stat);
   return file_stat.st_mtime;
 }
 
-bool file_exists(const char* filePath)
+bool file_exists(const char *filePath)
 {
   SM_ASSERT(filePath, "No filePath supplied!");
 
   auto file = fopen(filePath, "rb");
-  if(!file)
+  if (!file)
   {
     return false;
   }
@@ -153,13 +193,13 @@ bool file_exists(const char* filePath)
   return true;
 }
 
-long get_file_size(const char* filePath)
+long get_file_size(const char *filePath)
 {
   SM_ASSERT(filePath, "No filePath supplied!");
 
   long fileSize = 0;
   auto file = fopen(filePath, "rb");
-  if(!file)
+  if (!file)
   {
     SM_ERROR("Failed opening File: %s", filePath);
     return 0;
@@ -174,11 +214,11 @@ long get_file_size(const char* filePath)
 }
 
 /*
-* Reads a file into a supplied buffer. We manage our own
-* memory and therefore want more control over where it 
-* is allocated
-*/
-char* read_file(const char* filePath, int* fileSize, char* buffer)
+ * Reads a file into a supplied buffer. We manage our own
+ * memory and therefore want more control over where it
+ * is allocated
+ */
+char *read_file(const char *filePath, int *fileSize, char *buffer)
 {
   SM_ASSERT(filePath, "No filePath supplied!");
   SM_ASSERT(fileSize, "No fileSize supplied!");
@@ -186,7 +226,7 @@ char* read_file(const char* filePath, int* fileSize, char* buffer)
 
   *fileSize = 0;
   auto file = fopen(filePath, "rb");
-  if(!file)
+  if (!file)
   {
     SM_ERROR("Failed opening File: %s", filePath);
     return nullptr;
@@ -204,27 +244,27 @@ char* read_file(const char* filePath, int* fileSize, char* buffer)
   return buffer;
 }
 
-char* read_file(const char* filePath, int* fileSize, BumpAllocator* bumpAllocator)
+char *read_file(const char *filePath, int *fileSize, BumpAllocator *bumpAllocator)
 {
-  char* file = nullptr;
+  char *file = nullptr;
   long fileSize2 = get_file_size(filePath);
 
-  if(fileSize2)
+  if (fileSize2)
   {
-    char* buffer = bump_alloc(bumpAllocator, fileSize2 + 1);
+    char *buffer = bump_alloc(bumpAllocator, fileSize2 + 1);
 
     file = read_file(filePath, fileSize, buffer);
   }
 
-  return file; 
+  return file;
 }
 
-void write_file(const char* filePath, char* buffer, int size)
+void write_file(const char *filePath, char *buffer, int size)
 {
   SM_ASSERT(filePath, "No filePath supplied!");
   SM_ASSERT(buffer, "No buffer supplied!");
   auto file = fopen(filePath, "wb");
-  if(!file)
+  if (!file)
   {
     SM_ERROR("Failed opening File: %s", filePath);
     return;
@@ -234,38 +274,38 @@ void write_file(const char* filePath, char* buffer, int size)
   fclose(file);
 }
 
-bool copy_file(const char* fileName, const char* outputName, char* buffer)
+bool copy_file(const char *fileName, const char *outputName, char *buffer)
 {
   int fileSize = 0;
-  char* data = read_file(fileName, &fileSize, buffer);
+  char *data = read_file(fileName, &fileSize, buffer);
 
   auto outputFile = fopen(outputName, "wb");
-  if(!outputFile)
+  if (!outputFile)
   {
     SM_ERROR("Failed opening File: %s", outputName);
     return false;
   }
 
   int result = fwrite(data, sizeof(char), fileSize, outputFile);
-  if(!result)
+  if (!result)
   {
     SM_ERROR("Failed opening File: %s", outputName);
     return false;
   }
-  
+
   fclose(outputFile);
 
   return true;
 }
 
-bool copy_file(const char* fileName, const char* outputName, BumpAllocator* bumpAllocator)
+bool copy_file(const char *fileName, const char *outputName, BumpAllocator *bumpAllocator)
 {
-  char* file = 0;
+  char *file = 0;
   long fileSize2 = get_file_size(fileName);
 
-  if(fileSize2)
+  if (fileSize2)
   {
-    char* buffer = bump_alloc(bumpAllocator, fileSize2 + 1);
+    char *buffer = bump_alloc(bumpAllocator, fileSize2 + 1);
 
     return copy_file(fileName, outputName, buffer);
   }
@@ -353,7 +393,7 @@ struct Vec4
       float z;
       float w;
     };
-    
+
     struct
     {
       float r;
@@ -362,7 +402,7 @@ struct Vec4
       float a;
     };
   };
-  float& operator[](int idx)
+  float &operator[](int idx)
   {
     return values[idx];
   }
@@ -374,7 +414,7 @@ struct Vec4
 };
 struct Mat4
 {
-  union 
+  union
   {
     Vec4 values[4];
     struct
@@ -393,14 +433,14 @@ struct Mat4
       float bz;
       float cz;
       float dz;
-      
+
       float aw;
       float bw;
       float cw;
       float dw;
     };
   };
-  Vec4& operator[](int col)
+  Vec4 &operator[](int col)
   {
     return values[col];
   }
@@ -413,10 +453,9 @@ Mat4 orthographic_projection(float left, float right, float top, float bottom)
   result.bw = (top + bottom) / (top - bottom);
   result.cw = 0.0f; // Near Plane
   result[0][0] = 2.0f / (right - left);
-  result[1][1] = 2.0f / (top - bottom); 
+  result[1][1] = 2.0f / (top - bottom);
   result[2][2] = 1.0f / (1.0f - 0.0f); // Far and Near
   result[3][3] = 1.0f;
 
   return result;
 }
-
