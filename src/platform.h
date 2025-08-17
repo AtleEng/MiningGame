@@ -2,6 +2,7 @@
 
 // ################################     Platform Globals    ################################
 static bool running = true;
+static KeyCodeID KeyCodeLookupTable[KEY_COUNT];
 
 // ################################     Platform Functions    ################################
 bool platform_create_window(int width, int height, char *title);
@@ -13,3 +14,5 @@ void platform_swap_buffers();
 void* platform_load_dynamic_library(const char* dll);
 void* platform_load_dynamic_function(void* dll, const char* funName);
 bool platform_free_dynamic_library(void* dll);
+
+void platform_fill_keycode_lookup_table();

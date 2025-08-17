@@ -15,10 +15,12 @@
 #define DEBUG_BREAK() __builtin_trap()
 #endif
 
+#define b8 char
 #define BIT(x) 1 << (x)
 #define KB(x) ((unsigned long long)1024 * x)
 #define MB(x) ((unsigned long long)1024 * KB(x))
 #define GB(x) ((unsigned long long)1024 * MB(x))
+
 // ################################     Logging    ################################
 enum TextColor
 {
@@ -277,6 +279,17 @@ struct Vec2
 {
   float x;
   float y;
+
+  Vec2 operator+(Vec2 other)
+  {
+    return {x + other.x, y + other.y};
+  }
+
+  Vec2 operator-(Vec2 other)
+  {
+    return {x - other.x, y - other.y};
+  }
+
   Vec2 operator/(float scalar)
   {
     return {x / scalar, y / scalar};
@@ -285,11 +298,6 @@ struct Vec2
   Vec2 operator*(float scalar)
   {
     return {x * scalar, y * scalar};
-  }
-
-  Vec2 operator-(Vec2 other)
-  {
-    return {x - other.x, y - other.y};
   }
 
   operator bool()
@@ -301,11 +309,38 @@ struct IVec2
 {
   int x;
   int y;
+
+  IVec2 operator+(IVec2 other)
+  {
+    return {x + other.x, y + other.y};
+  }
+
+  IVec2 operator-(IVec2 other)
+  {
+    return {x - other.x, y - other.y};
+  }
+
+  IVec2 operator/(int scalar)
+  {
+    return {x / scalar, y / scalar};
+  }
+
+  IVec2 operator*(int scalar)
+  {
+    return {x * scalar, y * scalar};
+  }
+
+  operator bool()
+  {
+    return x != 0.0f && y != 0.0f;
+  }
 };
+
 Vec2 vec_2(IVec2 v)
 {
   return Vec2{(float)v.x, (float)v.y};
 }
+
 struct Vec4
 {
   union

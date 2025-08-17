@@ -47,13 +47,11 @@ int main()
         return -1;
     }
 
-    input->screenSizeX = 1200;
-    input->screenSizeY = 720;
-    platform_create_window(input->screenSizeX, input->screenSizeY, "Vaults Below");
+    platform_fill_keycode_lookup_table();
+    platform_create_window(1280, 720, "Vaults Below");
 
     gl_init(&transientStorage);
-    reload_game_dll(&transientStorage);
-
+    
     while (running)
     {
         reload_game_dll(&transientStorage);

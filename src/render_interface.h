@@ -33,6 +33,30 @@ struct RenderData
 // ################################     Render Globals   ################################
 static RenderData* renderData;
 
+
+// ################################     Render Utils   ################################
+IVec2 screen_to_world(IVec2 screenPos)
+{
+  OrthographicCamera2D camera = renderData->gameCamera;
+
+  int xPos = (float)screenPos.x / 
+             (float)input->screenSize.x * 
+             camera.dimensions.x; // [0; dimensions.x]
+
+  // Offset using dimensions and position
+  xPos += -camera.dimensions.x / 2.0f + camera.position.x;
+
+  int yPos = (float)screenPos.y / 
+             (float)input->screenSize.y * 
+             camera.dimensions.y; // [0; dimensions.y]
+
+  // Offset using dimensions and position
+  yPos += camera.dimensions.y / 2.0f + camera.position.y;
+
+  return {xPos, yPos};
+}
+
+
 // ################################     Render Functions   ################################
 void draw_sprite(SpriteID spriteID, Vec2 pos)
 {
@@ -45,4 +69,8 @@ void draw_sprite(SpriteID spriteID, Vec2 pos)
     transform.spriteSize = sprite.spriteSize;
 
     renderData->transforms[renderData->transformCount++] = transform;
+}
+void draw_sprite(SpriteID spriteID, IVec2 pos)
+{
+    draw_sprite(spriteID, vec_2(pos));
 }
