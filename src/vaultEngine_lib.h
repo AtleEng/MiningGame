@@ -100,22 +100,22 @@ struct Array
 
   T &operator[](int idx)
   {
-    SM_ASSERT(idx >= 0, "idx negative!");
-    SM_ASSERT(idx < count, "Idx out of bounds!");
+    SM_ASSERT(idx >= 0, "idx is negative!");
+    SM_ASSERT(idx < count, "Idx is out of bounds!");
     return elements[idx];
   }
 
   int add(T element)
   {
-    SM_ASSERT(count < maxElements, "Array Full!");
+    SM_ASSERT(count < maxElements, "Array is Full!");
     elements[count] = element;
     return count++;
   }
 
   void remove_idx_and_swap(int idx)
   {
-    SM_ASSERT(idx >= 0, "idx negative!");
-    SM_ASSERT(idx < count, "idx out of bounds!");
+    SM_ASSERT(idx >= 0, "idx is negative!");
+    SM_ASSERT(idx < count, "idx is out of bounds!");
     elements[idx] = elements[--count];
   }
 

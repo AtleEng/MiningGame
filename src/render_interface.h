@@ -56,6 +56,11 @@ IVec2 screen_to_world(IVec2 screenPos)
 
 
 // ################################     Render Functions   ################################
+void draw_quad(Transform transform)
+{
+    renderData->transforms.add(transform);
+}
+
 void draw_quad(Vec2 pos, Vec2 size) //This draws the first pixel in the texture atlas (top-left)
 {
     Transform transform = {};

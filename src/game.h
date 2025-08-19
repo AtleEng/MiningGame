@@ -24,8 +24,8 @@ enum GameInputType
     JUMP,
 
     //Mouse
-    MOUSE_LEFT,
-    MOUSE_RIGHT,
+    PRIMARY,
+    SECONDARY,
     MOUSE_MIDDLE,
 
     //UI
@@ -51,12 +51,17 @@ struct GameState
     bool initialized = false;
     IVec2 playerPos;
 
+    Array<IVec2, 21> tileCoords;
     Tile worldGrid[WORLD_GRID.x][WORLD_GRID.y];
     KeyMapping keyMappings[GAME_INPUT_COUNT];
 };
 
 // ################################     Game Globals   ################################
 static GameState* gameState;
+
+// ################################     Game Functions (Exposed)   ################################
+void draw();
+void update_tiles();
 
 // ################################     Game Functions (Exposed)   ################################
 extern "C"
