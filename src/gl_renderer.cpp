@@ -138,8 +138,8 @@ bool gl_init(BumpAllocator *transientStorage)
     {
         glGenBuffers(1, &glContext.transformSBOID);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, glContext.transformSBOID);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Transform) * MAX_TRANSFORMS,
-                     renderData->transforms, GL_DYNAMIC_DRAW);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Transform) * renderData->transforms.maxElements,
+                     renderData->transforms.elements, GL_DYNAMIC_DRAW);
     }
 
     // Uniforms
@@ -188,12 +188,12 @@ void gl_render()
     // Opaque Object
     {
         // Copy transform to the GPU
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Transform) * renderData->transformCount,
-                        renderData->transforms);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Transform) * renderData->transforms.count,
+                        renderData->transforms.elements);
 
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderData->transformCount);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderData->transforms.count);
 
         // restet for next frame
-        renderData->transformCount = 0;
+        renderData->transforms.clear();
     }
 }

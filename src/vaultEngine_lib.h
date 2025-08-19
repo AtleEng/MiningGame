@@ -74,7 +74,8 @@ void _log(char *prefix, char *msg, TextColor textColor, Args... args)
   puts(textBuffer);
 }
 
-#define SM_LOG(msg, textColor, ...) _log("", msg, textColor, ##__VA_ARGS__);
+#define SM_LOG(msg, ...) _log("", msg, textColorWhite, ##__VA_ARGS__);
+#define SM_LOG_X(msg, textColor, ...) _log("", msg, textColor, ##__VA_ARGS__);
 #define SM_TRACE(msg, ...) _log("TRACE: ", msg, textColorGreen, ##__VA_ARGS__);
 #define SM_WARN(msg, ...) _log("WARN: ", msg, textColorYellow, ##__VA_ARGS__);
 #define SM_ERROR(msg, ...) _log("ERROR: ", msg, textColorRed, ##__VA_ARGS__);

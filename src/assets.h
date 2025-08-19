@@ -3,10 +3,10 @@
 #include "vaultEngine_lib.h"
 // ################################     Assets Constants    ################################
 
-
 // ################################     Assets Structs   ################################
 enum SpriteID
 {
+    SPRITE_BLANK,
     SPRITE_BLOCK,
 
     SPRITE_COUNT
@@ -25,9 +25,18 @@ Sprite get_sprite(SpriteID spriteID)
 
     switch (spriteID)
     {
+    case SPRITE_BLANK:
+    {
+        sprite.atlasOffset = {0, 0};
+        sprite.spriteSize = {1, 1};
+        break;
+    }
     case SPRITE_BLOCK:
-        sprite.atlasOffset = {0,0};
-        sprite.spriteSize = {16,16};
+    {
+        sprite.atlasOffset = {8, 0};
+        sprite.spriteSize = {8, 8};
+        break;
+    }
     }
     return sprite;
 }

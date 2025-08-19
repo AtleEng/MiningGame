@@ -2,6 +2,7 @@
 #include "vaultEngine_lib.h"
 #include "input.h"
 #include "render_interface.h"
+#include "glcorearb.h"
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX

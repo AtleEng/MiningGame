@@ -4,7 +4,6 @@
 #include "vaultEngine_lib.h"
 
 // ################################     Render Constants    ################################
-constexpr int MAX_TRANSFORMS = 1000;
 
 // ################################     Render Structs   ################################
 struct OrthographicCamera2D
@@ -26,8 +25,7 @@ struct RenderData
     OrthographicCamera2D gameCamera;
     OrthographicCamera2D uiCamera;
 
-    int transformCount;
-    Transform transforms[MAX_TRANSFORMS];
+    Array<Transform, 1000> transforms;
 };
 
 // ################################     Render Globals   ################################
@@ -58,6 +56,17 @@ IVec2 screen_to_world(IVec2 screenPos)
 
 
 // ################################     Render Functions   ################################
+void draw_quad(Vec2 pos, Vec2 size) //This draws the first pixel in the texture atlas (top-left)
+{
+    Transform transform = {};
+    transform.pos = pos - size/2.0f;
+    transform.size = size;
+    transform.atlasOffset = {0,0};
+    transform.spriteSize = {1,1};
+
+    renderData->transforms.add(transform);
+}
+
 void draw_sprite(SpriteID spriteID, Vec2 pos)
 {
     Sprite sprite = get_sprite(spriteID);
@@ -68,7 +77,7 @@ void draw_sprite(SpriteID spriteID, Vec2 pos)
     transform.atlasOffset = sprite.atlasOffset;
     transform.spriteSize = sprite.spriteSize;
 
-    renderData->transforms[renderData->transformCount++] = transform;
+    renderData->transforms.add(transform);
 }
 void draw_sprite(SpriteID spriteID, IVec2 pos)
 {
