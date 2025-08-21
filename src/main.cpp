@@ -21,10 +21,16 @@ typedef decltype(update_game) update_game_type;
 static update_game_type *update_game_ptr;
 
 // ################################     Cross Plaform functions    ################################
+// Used to get Delta Time
+#include <chrono>
+double get_delta_time();
+
 void reload_game_dll(BumpAllocator *transientStorage);
 
 int main()
 {
+    float dt = get_delta_time();
+
     BumpAllocator transientStorage = make_bump_allocator(MB(50));
     BumpAllocator persistentStorage = make_bump_allocator(MB(50));
 
@@ -54,11 +60,12 @@ int main()
     
     while (running)
     {
+        dt = get_delta_time();
         reload_game_dll(&transientStorage);
 
         // update
         platform_update_window();
-        update_game(gameState, renderData, input);
+        update_game(gameState, renderData, input, dt);
         gl_render(&transientStorage);
 
         platform_swap_buffers();
@@ -69,9 +76,22 @@ int main()
     return 0;
 }
 
-void update_game(GameState *gameStateIn, RenderData *renderDataIn, Input *inputIn)
+void update_game(GameState *gameStateIn, RenderData *renderDataIn, Input *inputIn, float dt)
 {
-    update_game_ptr(gameStateIn, renderDataIn, inputIn);
+    update_game_ptr(gameStateIn, renderDataIn, inputIn, dt);
+}
+
+double get_delta_time()
+{
+  // Only executed once when entering the function (static)
+  static auto lastTime = std::chrono::steady_clock::now();
+  auto currentTime = std::chrono::steady_clock::now();
+
+  // seconds
+  double delta = std::chrono::duration<double>(currentTime - lastTime).count(); 
+  lastTime = currentTime; 
+
+  return delta;
 }
 
 void reload_game_dll(BumpAllocator *transientStorage)

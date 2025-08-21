@@ -129,11 +129,9 @@ void update_tiles()
   }
 }
 
-
-
 // ################################     Game Functions (exposed)   ################################
 
-EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Input *inputIn)
+EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Input *inputIn, float dt)
 {
   if (renderData != renderDataIn)
   {
@@ -146,8 +144,6 @@ EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Inp
     renderData->gameCamera.dimensions = {WORLD_WIDTH, WORLD_HEIGHT};
     renderData->gameCamera.position.x = 160;
     renderData->gameCamera.position.y = -90;
-
-    gameState->initialized = true;
 
     // Key Mappings
     {
@@ -187,9 +183,42 @@ EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Inp
       // Black inside
       gameState->tileCoords.add({tilesPosition.x, tilesPosition.y + 5 * 8});
     }
+
+    gameState->initialized = true;
   }
 
   // updates in game
+  // Fixed Update Loop
+
+  gameState->updateTimer += dt;
+  while (gameState->updateTimer >= UPDATE_DELAY)
+  {
+    gameState->updateTimer -= UPDATE_DELAY;
+
+    fixed_update();
+
+    // Relative Mouse here, because more frames than simulations
+    input->relMouse = input->mousePos - input->prevMousePos;
+    input->prevMousePos = input->mousePos;
+
+    // Clear the transitionCount for every key
+    {
+      for (int keyCode = 0; keyCode < KEY_COUNT; keyCode++)
+      {
+        input->keys[keyCode].justReleased = false;
+        input->keys[keyCode].justPressed = false;
+        input->keys[keyCode].halfTransitionCount = 0;
+      }
+    }
+  }
+
+  draw();
+}
+
+void fixed_update()
+{
+  float dt = UPDATE_DELAY;
+  gameState->player.prevPos = gameState->player.pos;
 
   if (is_down(PRIMARY))
   {
@@ -228,13 +257,6 @@ EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Inp
   {
     gameState->player.pos.y += 1;
   }
-
-  draw();
-}
-
-void fixed_update()
-{
-
 }
 
 void draw()

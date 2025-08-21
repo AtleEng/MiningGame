@@ -5,7 +5,7 @@
 #include "render_interface.h"
 
 // ################################     Game Constants   ################################
-constexpr int UPDATES_PER_SECOND = 2;
+constexpr int UPDATES_PER_SECOND = 60;
 constexpr double UPDATE_DELAY = 1.0 / UPDATES_PER_SECOND;
 
 constexpr int WORLD_WIDTH = 320;
@@ -76,5 +76,5 @@ void fixed_update();
 // ################################     Game Functions (Exposed)   ################################
 extern "C"
 {
-    EXPORT_FN void update_game(GameState* gameStateIn, RenderData* renderDataIn, Input* inputIn);
+    EXPORT_FN void update_game(GameState* gameStateIn, RenderData* renderDataIn, Input* inputIn, float dt);
 }
