@@ -4,6 +4,7 @@
 #include <stdlib.h>   //malloc
 #include <string.h>   //memset
 #include <sys/stat.h> //edit timestamp of files
+#include <math.h>
 
 // ################################     Defines    ################################
 #ifdef _WIN32
@@ -315,6 +316,67 @@ bool copy_file(const char *fileName, const char *outputName, BumpAllocator *bump
 }
 
 // ################################     Math    ################################
+int sign(int x)
+{
+  return (x >= 0)? 1 : -1;
+}
+
+float sign(float x)
+{
+  return (x >= 0.0f)? 1.0f : -1.0f;
+}
+
+int min(int a, int b)
+{
+  return (a < b)? a : b;
+}
+
+int max(int a, int b)
+{
+  return (a > b)? a : b;
+}
+
+long long max(long long a, long long b)
+{
+  if(a > b)
+  {
+    return a;
+  }
+  return b;
+}
+
+float max(float a, float b)
+{
+  if(a > b)
+  {
+    return a;
+  }
+  return b;
+}
+
+float min(float a, float b)
+{
+  if(a < b)
+  {
+    return a;
+  }
+
+  return b;
+}
+
+float approach(float current, float target, float increase)
+{
+  if(current < target)
+  {
+    return min(current + increase, target);
+  }
+  return max(current - increase, target);
+}
+
+float lerp(float a, float b, float t)
+{
+  return a + (b - a) * t;
+}
 
 struct Vec2
 {
