@@ -8,6 +8,7 @@ enum SpriteID
 {
     SPRITE_BLANK,
     SPRITE_BLOCK,
+    SPRITE_PLAYER,
 
     SPRITE_COUNT
 };
@@ -35,6 +36,12 @@ Sprite get_sprite(SpriteID spriteID)
     {
         sprite.atlasOffset = {8, 0};
         sprite.spriteSize = {8, 8};
+        break;
+    }
+    case SPRITE_PLAYER:
+    {
+        sprite.atlasOffset = {16, 0};
+        sprite.spriteSize = {16, 16};
         break;
     }
     }

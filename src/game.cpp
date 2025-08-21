@@ -266,7 +266,7 @@ void draw()
   //player
   Player& player = gameState->player;
   IVec2 playerPos = lerp(player.prevPos, player.pos, interpolatedDT);
-  draw_sprite(SPRITE_BLOCK, playerPos);
+  draw_sprite(SPRITE_PLAYER, playerPos);
 
   // Draw tileset
   {
