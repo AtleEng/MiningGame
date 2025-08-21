@@ -5,6 +5,9 @@
 #include "render_interface.h"
 
 // ################################     Game Constants   ################################
+constexpr int UPDATES_PER_SECOND = 2;
+constexpr double UPDATE_DELAY = 1.0 / UPDATES_PER_SECOND;
+
 constexpr int WORLD_WIDTH = 320;
 constexpr int WORLD_HEIGHT = 180;
 
@@ -45,11 +48,18 @@ struct Tile
     bool isVisible;
 };
 
+struct Player
+{
+    IVec2 pos, prevPos;
+};
+
 
 struct GameState
 {
+    float updateTimer;
+
     bool initialized = false;
-    IVec2 playerPos;
+    Player player;
 
     Array<IVec2, 21> tileCoords;
     Tile worldGrid[WORLD_GRID.x][WORLD_GRID.y];
@@ -61,7 +71,7 @@ static GameState* gameState;
 
 // ################################     Game Functions (Exposed)   ################################
 void draw();
-void update_tiles();
+void fixed_update();
 
 // ################################     Game Functions (Exposed)   ################################
 extern "C"
