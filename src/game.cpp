@@ -261,7 +261,12 @@ void fixed_update()
 
 void draw()
 {
-  draw_sprite(SPRITE_BLOCK, gameState->player.pos);
+  float interpolatedDT = (float)(gameState->updateTimer / UPDATE_DELAY);
+
+  //player
+  Player& player = gameState->player;
+  IVec2 playerPos = lerp(player.prevPos, player.pos, interpolatedDT);
+  draw_sprite(SPRITE_BLOCK, playerPos);
 
   // Draw tileset
   {
