@@ -23,6 +23,7 @@
 #define GB(x) ((unsigned long long)1024 * MB(x))
 
 // ################################     Logging    ################################
+#pragma region
 enum TextColor
 {
   textColorBlack,
@@ -43,6 +44,7 @@ enum TextColor
   textColorBrightWhite,
   textColorCount
 };
+
 template <typename... Args>
 void _log(char *prefix, char *msg, TextColor textColor, Args... args)
 {
@@ -90,7 +92,10 @@ void _log(char *prefix, char *msg, TextColor textColor, Args... args)
     }                               \
   }                                 \
 
+#pragma endregion
+
 // ################################     Array    ################################
+#pragma region
 template <typename T, int N>
 struct Array
 {
@@ -129,8 +134,10 @@ struct Array
     return count == N;
   }
 };
+#pragma endregion
 
 // ################################     BumpAllocator    ################################
+#pragma region
 struct BumpAllocator
 {
   size_t capacity;
@@ -171,8 +178,10 @@ char *bump_alloc(BumpAllocator *bumpAllocator, size_t size)
   }
   return result;
 }
+#pragma endregion
 
 // ################################     File I/O    ################################
+#pragma region
 long long get_timestamp(const char *file)
 {
   struct stat file_stat = {};
@@ -313,8 +322,10 @@ bool copy_file(const char *fileName, const char *outputName, BumpAllocator *bump
 
   return false;
 }
+#pragma endregion
 
 // ################################     Math    ################################
+#pragma region
 int sign(int x)
 {
   return (x >= 0)? 1 : -1;
@@ -536,3 +547,46 @@ Mat4 orthographic_projection(float left, float right, float top, float bottom)
 
   return result;
 }
+
+struct Rect
+{
+  Vec2 pos;
+  Vec2 size;
+};
+
+struct IRect
+{
+  IVec2 pos;
+  IVec2 size;
+};
+
+bool point_in_rect(Vec2 point, Rect rect)
+{
+  return (point.x >= rect.pos.x &&
+          point.x <= rect.pos.x + rect.size.x &&
+          point.y >= rect.pos.y &&
+          point.y <= rect.pos.y + rect.size.y);
+}
+
+bool point_in_rect(Vec2 point, IRect rect)
+{
+  return (point.x >= rect.pos.x &&
+          point.x <= rect.pos.x + rect.size.x &&
+          point.y >= rect.pos.y &&
+          point.y <= rect.pos.y + rect.size.y);
+}
+
+bool point_in_rect(IVec2 point, IRect rect)
+{
+  return point_in_rect(vec_2(point), rect);
+}
+
+bool rect_collision(IRect a, IRect b)
+{
+  return a.pos.x < b.pos.x  + b.size.x && // Collision on Left of a and right of b
+         a.pos.x + a.size.x > b.pos.x  && // Collision on Right of a and left of b
+         a.pos.y < b.pos.y  + b.size.y && // Collision on Bottom of a and Top of b
+         a.pos.y + a.size.y > b.pos.y;    // Collision on Top of a and Bottom of b
+}
+#pragma endregion
+

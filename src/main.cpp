@@ -1,19 +1,19 @@
 #include "vaultEngine_lib.h"
-#include "input.h"
+#include "engine_utils/input.h"
 
-#include "game.h"
+#include "game/game.h"
 
-#include "platform.h"
+#include "platform/platform.h"
 
 #define APIENTRY
 #define GL_GLEXT_PROTOTYPES
 #include "glcorearb.h"
 
 #ifdef _WIN32
-#include "win32_platform.cpp"
+#include "platform/win32_platform.cpp"
 #endif
 
-#include "gl_renderer.cpp"
+#include "render/gl_renderer.cpp"
 
 // ################################     Game DLL    ################################
 // this is the pointer to update_game in game.cpp

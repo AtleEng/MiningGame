@@ -1,7 +1,8 @@
 #include "platform.h"
-#include "vaultEngine_lib.h"
-#include "input.h"
-#include "render_interface.h"
+
+#include "../vaultEngine_lib.h"
+#include "../engine_utils/input.h"
+#include "../render/render_interface.h"
 #include "glcorearb.h"
 
 #define WIN32_LEAN_AND_MEAN

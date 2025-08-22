@@ -9,5 +9,5 @@ includes="-IthirdParty -IthirdParty/Include"
 clang++ $includes -g src/main.cpp -o vaultsBelow.exe $libs $warnings
 
 rm -f game_*
-clang++ -g "src/game.cpp" -shared -o game_$timestamp.dll $warnings
+clang++ -g "src/game/game.cpp" -shared -o game_$timestamp.dll $warnings
 mv game_$timestamp.dll game.dll

@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include "../game.h"
+#include "game.h"
 
 typedef struct {
     float x, y;

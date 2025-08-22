@@ -1,8 +1,9 @@
 #pragma once
 
-#include "input.h"
-#include "vaultEngine_lib.h"
-#include "render_interface.h"
+#include "../engine_utils/input.h"
+#include "../vaultEngine_lib.h"
+#include "../render/render_interface.h"
+#include "../engine_utils/assets.h"
 
 // ################################     Game Constants   ################################
 constexpr int UPDATES_PER_SECOND = 60;
@@ -12,7 +13,7 @@ constexpr int WORLD_WIDTH = 320;
 constexpr int WORLD_HEIGHT = 180;
 
 constexpr int TILESIZE = 8;
-constexpr IVec2 WORLD_GRID = {WORLD_WIDTH/TILESIZE, WORLD_HEIGHT/TILESIZE};
+constexpr IVec2 WORLD_GRID = {WORLD_WIDTH/TILESIZE, (WORLD_HEIGHT/TILESIZE) + 1};
 
 // ################################     Game Structs   ################################
 
@@ -48,9 +49,17 @@ struct Tile
     bool isVisible;
 };
 
-struct Player
+struct Transform
 {
     IVec2 pos, prevPos;
+
+    IVec2 aabb;
+
+    Vec2 speed;
+    Vec2 remainder;
+
+    bool hasCollided;
+    bool isGrounded;
 };
 
 
@@ -59,7 +68,7 @@ struct GameState
     float updateTimer;
 
     bool initialized = false;
-    Player player;
+    Transform player;
 
     Array<IVec2, 21> tileCoords;
     Tile worldGrid[WORLD_GRID.x][WORLD_GRID.y];
@@ -70,8 +79,9 @@ struct GameState
 static GameState* gameState;
 
 // ################################     Game Functions (Exposed)   ################################
-void draw();
+void init();
 void fixed_update();
+void draw();
 
 // ################################     Game Functions (Exposed)   ################################
 extern "C"

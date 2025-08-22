@@ -1,7 +1,7 @@
 #pragma once
 
-#include "assets.h"
-#include "vaultEngine_lib.h"
+#include "../engine_utils/assets.h"
+#include "../vaultEngine_lib.h"
 
 // ################################     Render Constants    ################################
 
@@ -12,7 +12,7 @@ struct OrthographicCamera2D
     Vec2 dimensions;
     Vec2 position;
 };
-struct Transform
+struct RenderTransform
 {
     Vec2 pos;
     Vec2 size;
@@ -25,7 +25,7 @@ struct RenderData
     OrthographicCamera2D gameCamera;
     OrthographicCamera2D uiCamera;
 
-    Array<Transform, 1000> transforms;
+    Array<RenderTransform, 1000> transforms;
 };
 
 // ################################     Render Globals   ################################
@@ -56,14 +56,14 @@ IVec2 screen_to_world(IVec2 screenPos)
 
 
 // ################################     Render Functions   ################################
-void draw_quad(Transform transform)
+void draw_quad(RenderTransform transform)
 {
     renderData->transforms.add(transform);
 }
 
 void draw_quad(Vec2 pos, Vec2 size) //This draws the first pixel in the texture atlas (top-left)
 {
-    Transform transform = {};
+    RenderTransform transform = {};
     transform.pos = pos - size/2.0f;
     transform.size = size;
     transform.atlasOffset = {0,0};
@@ -76,7 +76,7 @@ void draw_sprite(SpriteID spriteID, Vec2 pos)
 {
     Sprite sprite = get_sprite(spriteID);
 
-    Transform transform = {};
+    RenderTransform transform = {};
     transform.pos = pos - vec_2(sprite.spriteSize) / 2.0f;
     transform.size = vec_2(sprite.spriteSize);
     transform.atlasOffset = sprite.atlasOffset;
