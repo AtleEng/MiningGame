@@ -159,9 +159,7 @@ void Move(Transform &transform)
   IRect rect = get_world_AABB(transform);
 
   // get how big in tiles the transform is
-  IVec2 boundingSize = {(rect.size.x / TILESIZE) + 1, (rect.size.y / TILESIZE) + 1};
-
-  //SM_TRACE("x= %d y= %d", boundingSize.x, boundingSize.y);
+  IVec2 boundingSize = {(rect.size.x / TILESIZE), (rect.size.y / TILESIZE)};
   
   transform.pos.x += transform.speed.x;
   int moveX = round(transform.remainder.x);
@@ -355,9 +353,6 @@ void init()
           8,
           16};
 
-  SM_INFO("game has been init");
-  SM_DEBUG("?");
-  SM_CUSTOM("PHYSICS TEST", textColorOrange, "Kontakt!");
 }
 void fixed_update()
 {

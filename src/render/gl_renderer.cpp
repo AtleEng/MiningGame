@@ -32,11 +32,11 @@ static void APIENTRY gl_debug_callback(GLenum source, GLenum type, GLuint id, GL
         severity == GL_DEBUG_SEVERITY_MEDIUM ||
         severity == GL_DEBUG_SEVERITY_HIGH)
     {
-        SM_ASSERT(false, "OpenGL Error: %s", message);
+        LOG_ASSERT(false, "OpenGL Error: %s", message);
     }
     else
     {
-        SM_TRACE((char *)message);
+        LOG_TRACE((char *)message);
     }
 }
 
@@ -47,7 +47,7 @@ GLuint gl_create_shader(int shaderType, char *shaderPath, BumpAllocator *transie
 
     if (!shaderSource)
     {
-        SM_ASSERT(false, "Failed to load shader: %s", shaderPath);
+        LOG_ASSERT(false, "Failed to load shader: %s", shaderPath);
         return 0;
     }
 
@@ -64,7 +64,7 @@ GLuint gl_create_shader(int shaderType, char *shaderPath, BumpAllocator *transie
         if (!success)
         {
             glGetShaderInfoLog(shaderID, 2048, 0, shaderLog);
-            SM_ASSERT(false, "Failed to compile %s Shader, Error: %s", shaderPath, shaderLog);
+            LOG_ASSERT(false, "Failed to compile %s Shader, Error: %s", shaderPath, shaderLog);
             return 0;
         }
     }
@@ -87,7 +87,7 @@ bool gl_init(BumpAllocator *transientStorage)
                                            "assets/shaders/quad.frag", transientStorage);
     if (!vertShaderID || !fragShaderID)
     {
-        SM_ASSERT(false, "Failed to create shader");
+        LOG_ASSERT(false, "Failed to create shader");
         return false;
     }
 
@@ -116,7 +116,7 @@ bool gl_init(BumpAllocator *transientStorage)
         char *data = (char *)stbi_load(TEXTURE_PATH, &width, &height, &channels, 4);
         if (!data)
         {
-            SM_ASSERT(false, "Failed to load texture :(");
+            LOG_ASSERT(false, "Failed to load texture :(");
             return false;
         }
 
@@ -203,7 +203,7 @@ void gl_render(BumpAllocator *transientStorage)
                                                    "assets/shaders/quad.frag", transientStorage);
             if (!vertShaderID || !fragShaderID)
             {
-                SM_ASSERT(false, "Failed to create shader");
+                LOG_ASSERT(false, "Failed to create shader");
                 return;
             }
 

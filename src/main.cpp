@@ -37,25 +37,25 @@ int main()
     input = (Input *)bump_alloc(&persistentStorage, sizeof(Input));
     if (!input)
     {
-        SM_ERROR("Failed to allocate Input");
+        LOG_ERROR("Failed to allocate Input");
     }
 
     renderData = (RenderData *)bump_alloc(&persistentStorage, sizeof(RenderData));
     if (!renderData)
     {
-        SM_ERROR("Failed to allocate Renderdata");
+        LOG_ERROR("Failed to allocate Renderdata");
     }
 
     gameState = (GameState *)bump_alloc(&persistentStorage, sizeof(GameState));
     if (!gameState)
     {
-        SM_ERROR("Failed to allocate GameState");
+        LOG_ERROR("Failed to allocate GameState");
         return -1;
     }
 
     platform_fill_keycode_lookup_table();
     platform_create_window(1280, 720, "Vaults Below");
-
+    LOG_INFO("creating window");
     gl_init(&transientStorage);
     
     while (running)
@@ -72,7 +72,7 @@ int main()
 
         transientStorage.used = 0;
     }
-    SM_TRACE("Shuting game down...");
+    LOG_INFO("Shuting game down...");
     return 0;
 }
 
@@ -105,22 +105,22 @@ void reload_game_dll(BumpAllocator *transientStorage)
         if (gameDLL)
         {
             bool freeResult = platform_free_dynamic_library(gameDLL);
-            SM_ASSERT(freeResult, "Failed to free game.dll");
+            LOG_ASSERT(freeResult, "Failed to free game.dll");
             gameDLL = nullptr;
-            SM_TRACE("Freed game.dll");
+            LOG_TRACE("Freed game.dll");
         }
 
         while (!copy_file("game.dll", "game_load.dll", transientStorage))
         {
             Sleep(10);
         }
-        SM_TRACE("Copied game.dll into game_load.dll");
+        LOG_TRACE("Copied game.dll into game_load.dll");
 
         gameDLL = platform_load_dynamic_library("game_load.dll");
-        SM_ASSERT(gameDLL, "Failed to load game_load.dll");
+        LOG_ASSERT(gameDLL, "Failed to load game_load.dll");
 
         update_game_ptr = (update_game_type *)platform_load_dynamic_function(gameDLL, "update_game");
-        SM_ASSERT(update_game_ptr, "Failed to load update_game function");
+        LOG_ASSERT(update_game_ptr, "Failed to load update_game function");
         lastEditTimestampGameDLL = currentTimestampGameDLL;
     }
 }

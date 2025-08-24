@@ -77,7 +77,7 @@ extern "C" EXPORT_FN void _log(const char *prefix, TextColor textColor, const ch
   char textBuffer[8192] = {};
 
   va_list args;
-  va_start(args, msg); // <-- last named parameter before '...'
+  va_start(args, msg); // last named parameter before: ...
 
   // Combine prefix and color with the user format string
   snprintf(textBuffer, sizeof(textBuffer), "%s %s ", TextColorTable[textColor], prefix);
@@ -94,20 +94,22 @@ extern "C" EXPORT_FN void _log(const char *prefix, TextColor textColor, const ch
   puts(textBuffer);
 }
 
-#define SM_CUSTOM(prefix, textColor, msg, ...) _log(prefix, textColor, msg, ##__VA_ARGS__);
-#define SM_TRACE(msg, ...) _log("TRACE:", textColorGreen, msg, ##__VA_ARGS__);
-#define SM_DEBUG(msg, ...) _log("DEBUG:", textColorYellow, msg, ##__VA_ARGS__);
-#define SM_INFO(msg, ...) _log("INFO:", textColorAqua, msg, ##__VA_ARGS__);
-#define SM_WARN(msg, ...) _log("WARN:", textColorOrange, msg, ##__VA_ARGS__);
-#define SM_ERROR(msg, ...) _log("ERROR:", textColorRed, msg, ##__VA_ARGS__);
 
-#define SM_ASSERT(x, msg, ...)      \
+#define LOG(msg, ...) _log("TRACE:", textColorGreen, msg, ##__VA_ARGS__);
+#define LOG_TRACE(msg, ...) _log("TRACE:", textColorGreen, msg, ##__VA_ARGS__);
+#define LOG_DEBUG(msg, ...) _log("DEBUG:", textColorYellow, msg, ##__VA_ARGS__);
+#define LOG_INFO(msg, ...) _log("INFO:", textColorAqua, msg, ##__VA_ARGS__);
+#define LOG_WARN(msg, ...) _log("WARN:", textColorOrange, msg, ##__VA_ARGS__);
+#define LOG_ERROR(msg, ...) _log("ERROR:", textColorRed, msg, ##__VA_ARGS__);
+#define LOG_CUSTOM(prefix, textColor, msg, ...) _log(prefix, textColor, msg, ##__VA_ARGS__);
+
+#define LOG_ASSERT(x, msg, ...)      \
   {                                 \
     if (!(x))                       \
     {                               \
-      SM_ERROR(msg, ##__VA_ARGS__); \
+      LOG_ERROR(msg, ##__VA_ARGS__); \
       DEBUG_BREAK();                \
-      SM_ERROR("ASSERTION HIT");    \
+      LOG_ERROR("ASSERTION HIT");    \
     }                               \
   }
 
@@ -124,22 +126,22 @@ struct Array
 
   T &operator[](int idx)
   {
-    SM_ASSERT(idx >= 0, "idx is negative!");
-    SM_ASSERT(idx < count, "Idx is out of bounds!");
+    LOG_ASSERT(idx >= 0, "idx is negative!");
+    LOG_ASSERT(idx < count, "Idx is out of bounds!");
     return elements[idx];
   }
 
   int add(T element)
   {
-    SM_ASSERT(count < maxElements, "Array is Full!");
+    LOG_ASSERT(count < maxElements, "Array is Full!");
     elements[count] = element;
     return count++;
   }
 
   void remove_idx_and_swap(int idx)
   {
-    SM_ASSERT(idx >= 0, "idx is negative!");
-    SM_ASSERT(idx < count, "idx is out of bounds!");
+    LOG_ASSERT(idx >= 0, "idx is negative!");
+    LOG_ASSERT(idx < count, "idx is out of bounds!");
     elements[idx] = elements[--count];
   }
 
@@ -176,7 +178,7 @@ BumpAllocator make_bump_allocator(size_t size)
   }
   else
   {
-    SM_ASSERT(false, "Failed to allocate memory")
+    LOG_ERROR("Failed to allocate memory")
   }
   return ba;
 }
@@ -193,7 +195,7 @@ char *bump_alloc(BumpAllocator *bumpAllocator, size_t size)
   }
   else
   {
-    SM_ASSERT(false, "BumpAllocator is full");
+    LOG_ERROR("BumpAllocator is full");
   }
   return result;
 }
@@ -210,7 +212,7 @@ long long get_timestamp(const char *file)
 
 bool file_exists(const char *filePath)
 {
-  SM_ASSERT(filePath, "No filePath supplied!");
+  LOG_ASSERT(filePath, "No filePath supplied!");
 
   auto file = fopen(filePath, "rb");
   if (!file)
@@ -224,13 +226,13 @@ bool file_exists(const char *filePath)
 
 long get_file_size(const char *filePath)
 {
-  SM_ASSERT(filePath, "No filePath supplied!");
+  LOG_ASSERT(filePath, "No filePath supplied!");
 
   long fileSize = 0;
   auto file = fopen(filePath, "rb");
   if (!file)
   {
-    SM_ERROR("Failed opening File: %s", filePath);
+    LOG_ERROR("Failed opening File: %s", filePath);
     return 0;
   }
 
@@ -249,15 +251,15 @@ long get_file_size(const char *filePath)
  */
 char *read_file(const char *filePath, int *fileSize, char *buffer)
 {
-  SM_ASSERT(filePath, "No filePath supplied!");
-  SM_ASSERT(fileSize, "No fileSize supplied!");
-  SM_ASSERT(buffer, "No buffer supplied!");
+  LOG_ASSERT(filePath, "No filePath supplied!");
+  LOG_ASSERT(fileSize, "No fileSize supplied!");
+  LOG_ASSERT(buffer, "No buffer supplied!");
 
   *fileSize = 0;
   auto file = fopen(filePath, "rb");
   if (!file)
   {
-    SM_ERROR("Failed opening File: %s", filePath);
+    LOG_ERROR("Failed opening File: %s", filePath);
     return nullptr;
   }
 
@@ -290,12 +292,12 @@ char *read_file(const char *filePath, int *fileSize, BumpAllocator *bumpAllocato
 
 void write_file(const char *filePath, char *buffer, int size)
 {
-  SM_ASSERT(filePath, "No filePath supplied!");
-  SM_ASSERT(buffer, "No buffer supplied!");
+  LOG_ASSERT(filePath, "No filePath supplied!");
+  LOG_ASSERT(buffer, "No buffer supplied!");
   auto file = fopen(filePath, "wb");
   if (!file)
   {
-    SM_ERROR("Failed opening File: %s", filePath);
+    LOG_ERROR("Failed opening File: %s", filePath);
     return;
   }
 
@@ -311,14 +313,14 @@ bool copy_file(const char *fileName, const char *outputName, char *buffer)
   auto outputFile = fopen(outputName, "wb");
   if (!outputFile)
   {
-    SM_ERROR("Failed opening File: %s", outputName);
+    LOG_ERROR("Failed opening File: %s", outputName);
     return false;
   }
 
   int result = fwrite(data, sizeof(char), fileSize, outputFile);
   if (!result)
   {
-    SM_ERROR("Failed opening File: %s", outputName);
+    LOG_ERROR("Failed opening File: %s", outputName);
     return false;
   }
 
