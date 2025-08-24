@@ -160,8 +160,8 @@ void Move(Transform &transform)
 
   // get how big in tiles the transform is
   IVec2 boundingSize = {(rect.size.x / TILESIZE), (rect.size.y / TILESIZE)};
-  
-  transform.pos.x += transform.speed.x;
+
+  transform.remainder.x += transform.speed.x;
   int moveX = round(transform.remainder.x);
 
   if (moveX != 0)
@@ -174,14 +174,14 @@ void Move(Transform &transform)
     {
       while (moveX)
       {
-        transform.pos.x += moveSign;
+        rect.pos.x += moveSign;
 
         // loop through local tiles
         IVec2 gridPos = get_grid_pos(transform.pos);
 
-        for (int x = gridPos.x - boundingSize.x; x < gridPos.x + boundingSize.x; x++)
+        for (int x = gridPos.x - boundingSize.x; x <= gridPos.x + boundingSize.x; x++)
         {
-          for (int y = gridPos.y - boundingSize.y; y < gridPos.y + boundingSize.y; y++)
+          for (int y = gridPos.y - boundingSize.y; y <= gridPos.y + boundingSize.y; y++)
           {
             Tile *tile = get_tile(x, y);
 
@@ -190,8 +190,7 @@ void Move(Transform &transform)
               continue;
             }
             // Check collision
-            IRect tileRect = get_tile_rect(x, y);
-            if (rect_collision(rect, tileRect))
+            if (rect_collision(rect, get_tile_rect(x, y)))
             {
               transform.hasCollided = true;
               transform.speed.x = 0;
@@ -203,11 +202,14 @@ void Move(Transform &transform)
         // Move
         transform.pos.x += moveSign;
         moveX -= moveSign;
+
+        rect = get_world_AABB(transform);
       }
     };
+    moveTransformX();
   }
 
-  transform.pos.y += transform.speed.y;
+  transform.remainder.y += transform.speed.y;
   int moveY = round(transform.remainder.y);
 
   if (moveY != 0)
@@ -220,14 +222,14 @@ void Move(Transform &transform)
     {
       while (moveY)
       {
-        transform.pos.y += moveSign;
+        rect.pos.y += moveSign;
 
         // loop through local tiles
         IVec2 gridPos = get_grid_pos(transform.pos);
 
-        for (int x = gridPos.x - boundingSize.x; x < gridPos.x + boundingSize.x; x++)
+        for (int x = gridPos.x - boundingSize.x; x <= gridPos.x + boundingSize.x; x++)
         {
-          for (int y = gridPos.y - boundingSize.y; y < gridPos.y + boundingSize.y; y++)
+          for (int y = gridPos.y - boundingSize.y; y <= gridPos.y + boundingSize.y; y++)
           {
             Tile *tile = get_tile(x, y);
 
@@ -256,6 +258,7 @@ void Move(Transform &transform)
         moveY -= moveSign;
       }
     };
+    moveTransformY();
   }
 }
 
@@ -313,7 +316,7 @@ EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Inp
       // Black inside
       gameState->tileCoords.add({tilesPosition.x, tilesPosition.y + 5 * 8});
     }
-    
+
     init();
     gameState->initialized = true;
   }
@@ -352,12 +355,11 @@ void init()
       {
           8,
           16};
-
 }
 void fixed_update()
 {
   float dt = UPDATE_DELAY;
-  Transform& player = gameState->player;
+  Transform &player = gameState->player;
   player.prevPos = player.pos;
 
   constexpr float runSpeed = 2.0f;
@@ -366,8 +368,14 @@ void fixed_update()
   constexpr float flyReduce = 12.0f;
   constexpr float gravity = 13.0f;
   constexpr float fallSpeed = 3.6f;
-  constexpr float jumpSpeed = -3.0f;
+  constexpr float jumpSpeed = -4.0f;
 
+  // Jump
+  if (just_pressed(JUMP) && player.isGrounded)
+  {
+    player.speed.y = jumpSpeed;
+    player.isGrounded = false;
+  }
 
   if (is_down(MOVE_LEFT))
   {
