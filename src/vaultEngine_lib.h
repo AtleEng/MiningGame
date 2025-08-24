@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdarg>
+#include <cstdio>
 #include <stdio.h>
 #include <stdlib.h>   //malloc
 #include <string.h>   //memset
@@ -42,45 +44,62 @@ enum TextColor
   textColorBrightMagenta,
   textColorBrightCyan,
   textColorBrightWhite,
+  textColorOrange,
+  textColorPink,
+  textColorAqua,
   textColorCount
 };
+static char *TextColorTable[textColorCount] =
+    {
+        "\x1b[30m",       // BLACK
+        "\x1b[31m",       // RED
+        "\x1b[32m",       // GREEN
+        "\x1b[33m",       // YELLOW
+        "\x1b[34m",       // BLUE
+        "\x1b[35m",       // MAGENTA
+        "\x1b[36m",       // CYAN
+        "\x1b[37m",       // WHITE
+        "\x1b[90m",       // BRIGHT BLACK
+        "\x1b[91m",       // BRIGHT RED
+        "\x1b[92m",       // BRIGHT GREEN
+        "\x1b[93m",       // BRIGHT YELLOW
+        "\x1b[94m",       // BRIGHT BLUE
+        "\x1b[95m",       // BRIGHT MAGENTA
+        "\x1b[96m",       // BRIGHT CYAN
+        "\x1b[97m",       // BRIGHT WHITE
+        "\x1b[38;5;208m", // ORANGE (useful for WARN)
+        "\x1b[38;5;201m", // PINK (nice for DEBUG or TRACE)
+        "\x1b[38;5;51m",  // AQUA (soft TRACE)
+};
 
-template <typename... Args>
-void _log(char *prefix, char *msg, TextColor textColor, Args... args)
+extern "C" EXPORT_FN void _log(const char *prefix, TextColor textColor, const char *msg, ...)
 {
-  static char *TextColorTable[textColorCount] =
-      {
-          "\x1b[30m", // BLACK
-          "\x1b[31m", // RED
-          "\x1b[32m", // GREEN
-          "\x1b[33m", // YELLOW
-          "\x1b[34m", // BLUE
-          "\x1b[35m", // MAGENTA
-          "\x1b[36m", // CYAN
-          "\x1b[37m", // WHITE
-          "\x1b[90m", // BRIGHT BLACK
-          "\x1b[91m", // BRIGHT RED
-          "\x1b[92m", // BRIGHT GREEN
-          "\x1b[93m", // BRIGHT YELLOW
-          "\x1b[94m", // BRIGHT BLUE
-          "\x1b[95m", // BRIGHT MAGENTA
-          "\x1b[96m", // BRIGHT CYAN
-          "\x1b[97m", // BRIGHT WHITE
-      };
+  char textBuffer[8192] = {};
 
-  char formatBuffer[8192] = {};
-  sprintf(formatBuffer, "%s %s %s \033[0m", TextColorTable[textColor], prefix, msg);
+  va_list args;
+  va_start(args, msg); // <-- last named parameter before '...'
 
-  char textBuffer[8912] = {};
-  sprintf(textBuffer, formatBuffer, args...);
+  // Combine prefix and color with the user format string
+  snprintf(textBuffer, sizeof(textBuffer), "%s %s ", TextColorTable[textColor], prefix);
+
+  // Append the user-provided formatted string
+  size_t len = strlen(textBuffer);
+  vsnprintf(textBuffer + len, sizeof(textBuffer) - len, msg, args);
+
+  va_end(args);
+
+  // Reset color
+  strcat(textBuffer, "\033[0m");
 
   puts(textBuffer);
 }
 
-#define SM_LOG(msg, ...) _log("", msg, textColorWhite, ##__VA_ARGS__);
-#define SM_TRACE(msg, ...) _log("TRACE: ", msg, textColorGreen, ##__VA_ARGS__);
-#define SM_WARN(msg, ...) _log("WARN: ", msg, textColorYellow, ##__VA_ARGS__);
-#define SM_ERROR(msg, ...) _log("ERROR: ", msg, textColorRed, ##__VA_ARGS__);
+#define SM_CUSTOM(prefix, textColor, msg, ...) _log(prefix, textColor, msg, ##__VA_ARGS__);
+#define SM_TRACE(msg, ...) _log("TRACE:", textColorGreen, msg, ##__VA_ARGS__);
+#define SM_DEBUG(msg, ...) _log("DEBUG:", textColorYellow, msg, ##__VA_ARGS__);
+#define SM_INFO(msg, ...) _log("INFO:", textColorAqua, msg, ##__VA_ARGS__);
+#define SM_WARN(msg, ...) _log("WARN:", textColorOrange, msg, ##__VA_ARGS__);
+#define SM_ERROR(msg, ...) _log("ERROR:", textColorRed, msg, ##__VA_ARGS__);
 
 #define SM_ASSERT(x, msg, ...)      \
   {                                 \
@@ -90,7 +109,7 @@ void _log(char *prefix, char *msg, TextColor textColor, Args... args)
       DEBUG_BREAK();                \
       SM_ERROR("ASSERTION HIT");    \
     }                               \
-  }                                 \
+  }
 
 #pragma endregion
 
@@ -328,27 +347,27 @@ bool copy_file(const char *fileName, const char *outputName, BumpAllocator *bump
 #pragma region
 int sign(int x)
 {
-  return (x >= 0)? 1 : -1;
+  return (x >= 0) ? 1 : -1;
 }
 
 float sign(float x)
 {
-  return (x >= 0.0f)? 1.0f : -1.0f;
+  return (x >= 0.0f) ? 1.0f : -1.0f;
 }
 
 int min(int a, int b)
 {
-  return (a < b)? a : b;
+  return (a < b) ? a : b;
 }
 
 int max(int a, int b)
 {
-  return (a > b)? a : b;
+  return (a > b) ? a : b;
 }
 
 long long max(long long a, long long b)
 {
-  if(a > b)
+  if (a > b)
   {
     return a;
   }
@@ -357,7 +376,7 @@ long long max(long long a, long long b)
 
 float max(float a, float b)
 {
-  if(a > b)
+  if (a > b)
   {
     return a;
   }
@@ -366,7 +385,7 @@ float max(float a, float b)
 
 float min(float a, float b)
 {
-  if(a < b)
+  if (a < b)
   {
     return a;
   }
@@ -376,7 +395,7 @@ float min(float a, float b)
 
 float approach(float current, float target, float increase)
 {
-  if(current < target)
+  if (current < target)
   {
     return min(current + increase, target);
   }
@@ -583,10 +602,9 @@ bool point_in_rect(IVec2 point, IRect rect)
 
 bool rect_collision(IRect a, IRect b)
 {
-  return a.pos.x < b.pos.x  + b.size.x && // Collision on Left of a and right of b
-         a.pos.x + a.size.x > b.pos.x  && // Collision on Right of a and left of b
-         a.pos.y < b.pos.y  + b.size.y && // Collision on Bottom of a and Top of b
-         a.pos.y + a.size.y > b.pos.y;    // Collision on Top of a and Bottom of b
+  return a.pos.x < b.pos.x + b.size.x && // Collision on Left of a and right of b
+         a.pos.x + a.size.x > b.pos.x && // Collision on Right of a and left of b
+         a.pos.y < b.pos.y + b.size.y && // Collision on Bottom of a and Top of b
+         a.pos.y + a.size.y > b.pos.y;   // Collision on Top of a and Bottom of b
 }
 #pragma endregion
-

@@ -5,6 +5,7 @@
 // ################################     Game Structs   ################################
 
 // ################################     Game Functions   ################################
+
 // Grid system
 IVec2 get_grid_pos(IVec2 worldPos)
 {
@@ -159,7 +160,9 @@ void Move(Transform &transform)
 
   // get how big in tiles the transform is
   IVec2 boundingSize = {(rect.size.x / TILESIZE) + 1, (rect.size.y / TILESIZE) + 1};
-  //SM_LOG("%s %s", boundingSize.x, boundingSize.y);
+
+  //SM_TRACE("x= %d y= %d", boundingSize.x, boundingSize.y);
+  
   transform.pos.x += transform.speed.x;
   int moveX = round(transform.remainder.x);
 
@@ -312,7 +315,8 @@ EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Inp
       // Black inside
       gameState->tileCoords.add({tilesPosition.x, tilesPosition.y + 5 * 8});
     }
-    void init();
+    
+    init();
     gameState->initialized = true;
   }
 
@@ -350,6 +354,10 @@ void init()
       {
           8,
           16};
+
+  SM_INFO("game has been init");
+  SM_DEBUG("?");
+  SM_CUSTOM("PHYSICS TEST", textColorOrange, "Kontakt!");
 }
 void fixed_update()
 {

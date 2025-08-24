@@ -72,7 +72,7 @@ int main()
 
         transientStorage.used = 0;
     }
-    
+    SM_TRACE("Shuting game down...");
     return 0;
 }
 
