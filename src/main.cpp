@@ -2,6 +2,7 @@
 #include "engine_utils/input.h"
 
 #include "game/game.h"
+#include "engine_utils/sound.h"
 
 #include "platform/platform.h"
 
@@ -32,7 +33,7 @@ int main()
     float dt = get_delta_time();
 
     BumpAllocator transientStorage = make_bump_allocator(MB(50));
-    BumpAllocator persistentStorage = make_bump_allocator(MB(50));
+    BumpAllocator persistentStorage = make_bump_allocator(MB(256));
 
     input = (Input *)bump_alloc(&persistentStorage, sizeof(Input));
     if (!input)
@@ -52,12 +53,36 @@ int main()
         LOG_ERROR("Failed to allocate GameState");
         return -1;
     }
+    soundState = (SoundState *)bump_alloc(&persistentStorage, sizeof(GameState));
+    if (!soundState)
+    {
+        LOG_ERROR("Failed to allocate SoundState");
+        return -1;
+    }
+    soundState->transientStorage = &transientStorage;
+    soundState->allocatedsoundsBuffer = bump_alloc(&persistentStorage, SOUNDS_BUFFER_SIZE);
+    if (!soundState->allocatedsoundsBuffer)
+    {
+        LOG_ERROR("Failed to allocated sounds buffer");
+        return -1;
+    }
 
     platform_fill_keycode_lookup_table();
     platform_create_window(1280, 720, "Vaults Below");
     LOG_INFO("creating window");
+
+    if (!platform_init_audio())
+    {
+        LOG_ERROR("Failed to initialize audio");
+        return -1;
+    }
+    else
+    {
+        LOG_INFO("audio has been initialized");
+    }
+
     gl_init(&transientStorage);
-    
+
     while (running)
     {
         dt = get_delta_time();
@@ -65,33 +90,34 @@ int main()
 
         // update
         platform_update_window();
-        update_game(gameState, renderData, input, dt);
+        update_game(gameState, renderData, input, soundState, dt);
         gl_render(&transientStorage);
+        platform_update_audio(dt);
 
         platform_swap_buffers();
 
         transientStorage.used = 0;
     }
-    LOG_INFO("Shuting game down...");
+
     return 0;
 }
 
-void update_game(GameState *gameStateIn, RenderData *renderDataIn, Input *inputIn, float dt)
+void update_game(GameState *gameStateIn, RenderData *renderDataIn, Input *inputIn, SoundState *soundStateIn, float dt)
 {
-    update_game_ptr(gameStateIn, renderDataIn, inputIn, dt);
+    update_game_ptr(gameStateIn, renderDataIn, inputIn, soundStateIn, dt);
 }
 
 double get_delta_time()
 {
-  // Only executed once when entering the function (static)
-  static auto lastTime = std::chrono::steady_clock::now();
-  auto currentTime = std::chrono::steady_clock::now();
+    // Only executed once when entering the function (static)
+    static auto lastTime = std::chrono::steady_clock::now();
+    auto currentTime = std::chrono::steady_clock::now();
 
-  // seconds
-  double delta = std::chrono::duration<double>(currentTime - lastTime).count(); 
-  lastTime = currentTime; 
+    // seconds
+    double delta = std::chrono::duration<double>(currentTime - lastTime).count();
+    lastTime = currentTime;
 
-  return delta;
+    return delta;
 }
 
 void reload_game_dll(BumpAllocator *transientStorage)

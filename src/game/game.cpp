@@ -264,13 +264,14 @@ void Move(Transform &transform)
 
 // ################################     Game Functions (exposed)   ################################
 
-EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Input *inputIn, float dt)
+EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Input *inputIn, SoundState *soundStateIn, float dt)
 {
   if (renderData != renderDataIn)
   {
     renderData = renderDataIn;
     input = inputIn;
     gameState = gameStateIn;
+    soundState = soundStateIn;
   }
   if (!gameState->initialized)
   {
@@ -374,6 +375,8 @@ void fixed_update()
   if (just_pressed(JUMP) && player.isGrounded)
   {
     player.speed.y = jumpSpeed;
+
+    sound_play("jump");
     player.isGrounded = false;
   }
 

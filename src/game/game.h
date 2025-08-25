@@ -4,6 +4,7 @@
 #include "../vaultEngine_lib.h"
 #include "../render/render_interface.h"
 #include "../engine_utils/assets.h"
+#include "../engine_utils/sound.h"
 
 // ################################     Game Constants   ################################
 constexpr int UPDATES_PER_SECOND = 60;
@@ -86,5 +87,5 @@ void draw();
 // ################################     Game Functions (Exposed)   ################################
 extern "C"
 {
-    EXPORT_FN void update_game(GameState* gameStateIn, RenderData* renderDataIn, Input* inputIn, float dt);
+    EXPORT_FN void update_game(GameState* gameStateIn, RenderData* renderDataIn, Input* inputIn, SoundState* soundStateIn, float dt);
 }
