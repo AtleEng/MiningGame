@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../engine_utils/assets.h"
+#include "../engine_utils/shader_header.h"
 #include "../vaultEngine_lib.h"
 
 // ################################     Render Constants    ################################
@@ -17,16 +18,6 @@ struct OrthographicCamera2D
 struct DrawData
 {
     int animationIdx;
-    int renderOptions;
-};
-struct RenderTransform
-{
-    Vec2 pos;
-    Vec2 size;
-    IVec2 atlasOffset;
-    IVec2 spriteSize;
-    int animationIdx;
-    // TODO this fucks up tile render for some reson?
     int renderOptions;
 };
 

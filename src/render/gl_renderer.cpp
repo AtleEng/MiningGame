@@ -43,16 +43,28 @@ static void APIENTRY gl_debug_callback(GLenum source, GLenum type, GLuint id, GL
 GLuint gl_create_shader(int shaderType, char *shaderPath, BumpAllocator *transientStorage)
 {
     int fileSize = 0;
+    char *shaderHeader = read_file("src/engine_utils/shader_header.h", &fileSize, transientStorage); //  <-- Hardcoded file adress
     char *shaderSource = read_file(shaderPath, &fileSize, transientStorage);
-
+    if (!shaderHeader)
+    {
+        LOG_ERROR("Failed to load shader_header.h: %s", shaderPath);
+        return 0;
+    }
     if (!shaderSource)
     {
-        LOG_ASSERT(false, "Failed to load shader: %s", shaderPath);
+        LOG_ERROR("Failed to load shader: %s", shaderPath);
         return 0;
     }
 
+    char* shaderSources[] =
+    {
+        "#version 430 core\r\n",
+        shaderHeader,
+        shaderSource
+    };
+
     GLuint shaderID = glCreateShader(shaderType);
-    glShaderSource(shaderID, 1, &shaderSource, 0);
+    glShaderSource(shaderID, ArraySize(shaderSources), shaderSources, 0);
     glCompileShader(shaderID);
 
     // Test if Shader compiled successfully
@@ -64,7 +76,7 @@ GLuint gl_create_shader(int shaderType, char *shaderPath, BumpAllocator *transie
         if (!success)
         {
             glGetShaderInfoLog(shaderID, 2048, 0, shaderLog);
-            LOG_ASSERT(false, "Failed to compile %s Shader, Error: %s", shaderPath, shaderLog);
+            LOG_ERROR("Failed to compile %s Shader, Error: %s", shaderPath, shaderLog);
             return 0;
         }
     }
@@ -87,7 +99,7 @@ bool gl_init(BumpAllocator *transientStorage)
                                            "assets/shaders/quad.frag", transientStorage);
     if (!vertShaderID || !fragShaderID)
     {
-        LOG_ASSERT(false, "Failed to create shader");
+        LOG_ERROR("Failed to create shader");
         return false;
     }
 
@@ -116,7 +128,7 @@ bool gl_init(BumpAllocator *transientStorage)
         char *data = (char *)stbi_load(TEXTURE_PATH, &width, &height, &channels, 4);
         if (!data)
         {
-            LOG_ASSERT(false, "Failed to load texture :(");
+            LOG_ERROR("Failed to load texture :(");
             return false;
         }
 
@@ -203,7 +215,7 @@ void gl_render(BumpAllocator *transientStorage)
                                                    "assets/shaders/quad.frag", transientStorage);
             if (!vertShaderID || !fragShaderID)
             {
-                LOG_ASSERT(false, "Failed to create shader");
+                LOG_ERROR("Failed to create shader");
                 return;
             }
 
