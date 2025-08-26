@@ -56,12 +56,11 @@ GLuint gl_create_shader(int shaderType, char *shaderPath, BumpAllocator *transie
         return 0;
     }
 
-    char* shaderSources[] =
-    {
-        "#version 430 core\r\n",
-        shaderHeader,
-        shaderSource
-    };
+    char *shaderSources[] =
+        {
+            "#version 430 core\r\n",
+            shaderHeader,
+            shaderSource};
 
     GLuint shaderID = glCreateShader(shaderType);
     glShaderSource(shaderID, ArraySize(shaderSources), shaderSources, 0);
@@ -208,6 +207,7 @@ void gl_render(BumpAllocator *transientStorage)
 
         if (timestampVert > glContext.shaderTimestamp || timestampFrag > glContext.shaderTimestamp)
         {
+            LOG_INFO("Reloading shaders");
             //* Shader creation + hot reloading
             GLuint vertShaderID = gl_create_shader(GL_VERTEX_SHADER,
                                                    "assets/shaders/quad.vert", transientStorage);
@@ -218,15 +218,34 @@ void gl_render(BumpAllocator *transientStorage)
                 LOG_ERROR("Failed to create shader");
                 return;
             }
+            GLuint programID = glCreateProgram();
+            glAttachShader(programID, vertShaderID);
+            glAttachShader(programID, fragShaderID);
+            glLinkProgram(programID);
 
-            glAttachShader(glContext.programID, vertShaderID);
-            glAttachShader(glContext.programID, fragShaderID);
-            glLinkProgram(glContext.programID);
-
-            glDetachShader(glContext.programID, vertShaderID);
-            glDetachShader(glContext.programID, fragShaderID);
+            glDetachShader(programID, vertShaderID);
+            glDetachShader(programID, fragShaderID);
             glDeleteShader(vertShaderID);
             glDeleteShader(fragShaderID);
+
+            // Validate if program works
+            {
+                int programSuccess;
+                char programInfoLog[512];
+                glGetProgramiv(programID, GL_LINK_STATUS, &programSuccess);
+
+                if (!programSuccess)
+                {
+                    glGetProgramInfoLog(programID, 512, 0, programInfoLog);
+
+                    LOG_ERROR("Failed to link program: %s", programInfoLog);
+                    return;
+                }
+            }
+
+            glDeleteProgram(glContext.programID);
+            glContext.programID = programID;
+            glUseProgram(programID);
 
             glContext.shaderTimestamp = max(timestampVert, timestampFrag);
         }
