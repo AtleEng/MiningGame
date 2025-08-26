@@ -14,26 +14,26 @@ constexpr int WORLD_WIDTH = 320;
 constexpr int WORLD_HEIGHT = 180;
 
 constexpr int TILESIZE = 8;
-constexpr IVec2 WORLD_GRID = {WORLD_WIDTH/TILESIZE, (WORLD_HEIGHT/TILESIZE) + 1};
+constexpr IVec2 WORLD_GRID = {WORLD_WIDTH / TILESIZE, (WORLD_HEIGHT / TILESIZE) + 1};
 
 // ################################     Game Structs   ################################
 
-//input
+// input
 enum GameInputType
 {
-    //Movement
+    // Movement
     MOVE_LEFT,
     MOVE_RIGHT,
     MOVE_UP,
     MOVE_DOWN,
     JUMP,
 
-    //Mouse
+    // Mouse
     PRIMARY,
     SECONDARY,
     MOUSE_MIDDLE,
 
-    //UI
+    // UI
     MENU,
 
     GAME_INPUT_COUNT
@@ -50,6 +50,14 @@ struct Tile
     bool isVisible;
 };
 
+enum PlayerAnimState
+{
+    PLAYER_ANIM_IDLE,
+    PLAYER_ANIM_RUN,
+    PLAYER_ANIM_JUMP,
+    PLAYER_ANIM_COUNT
+};
+
 struct Transform
 {
     IVec2 pos, prevPos;
@@ -61,8 +69,12 @@ struct Transform
 
     bool hasCollided;
     bool isGrounded;
-};
 
+    int renderOptions;
+    float frameTime;
+    PlayerAnimState animState;
+    SpriteID animationSprites[PLAYER_ANIM_COUNT];
+};
 
 struct GameState
 {
@@ -77,7 +89,7 @@ struct GameState
 };
 
 // ################################     Game Globals   ################################
-static GameState* gameState;
+static GameState *gameState;
 
 // ################################     Game Functions (Exposed)   ################################
 void init();
@@ -87,5 +99,5 @@ void draw();
 // ################################     Game Functions (Exposed)   ################################
 extern "C"
 {
-    EXPORT_FN void update_game(GameState* gameStateIn, RenderData* renderDataIn, Input* inputIn, SoundState* soundStateIn, float dt);
+    EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Input *inputIn, SoundState *soundStateIn, float dt);
 }

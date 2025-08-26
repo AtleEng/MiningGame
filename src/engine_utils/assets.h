@@ -9,6 +9,8 @@ enum SpriteID
     SPRITE_BLANK,
     SPRITE_BLOCK,
     SPRITE_PLAYER,
+    SPRITE_PLAYER_RUN,
+    SPRITE_PLAYER_JUMP,
 
     SPRITE_COUNT
 };
@@ -17,6 +19,7 @@ struct Sprite
 {
     IVec2 atlasOffset;
     IVec2 spriteSize;
+    int frameCount = 1;
 };
 
 // ################################     Assets Functions   ################################
@@ -41,6 +44,19 @@ Sprite get_sprite(SpriteID spriteID)
     case SPRITE_PLAYER:
     {
         sprite.atlasOffset = {16, 0};
+        sprite.spriteSize = {16, 16};
+        break;
+    }
+    case SPRITE_PLAYER_RUN:
+    {
+        sprite.atlasOffset = {32, 0};
+        sprite.spriteSize = {16, 16};
+        sprite.frameCount = 8;
+        break;
+    }
+    case SPRITE_PLAYER_JUMP:
+    {
+        sprite.atlasOffset = {48, 0};
         sprite.spriteSize = {16, 16};
         break;
     }

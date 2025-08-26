@@ -356,12 +356,17 @@ void init()
       {
           8,
           16};
+  gameState->player.animationSprites[PLAYER_ANIM_IDLE] = SPRITE_PLAYER;
+  gameState->player.animationSprites[PLAYER_ANIM_RUN] = SPRITE_PLAYER_RUN;
+  gameState->player.animationSprites[PLAYER_ANIM_JUMP] = SPRITE_PLAYER_JUMP;
 }
 void fixed_update()
 {
   float dt = UPDATE_DELAY;
   Transform &player = gameState->player;
   player.prevPos = player.pos;
+
+  player.animState = PLAYER_ANIM_IDLE;
 
   constexpr float runSpeed = 2.0f;
   constexpr float runAcceleration = 10.0f;
@@ -370,6 +375,15 @@ void fixed_update()
   constexpr float gravity = 13.0f;
   constexpr float fallSpeed = 3.6f;
   constexpr float jumpSpeed = -4.0f;
+  // flip
+  if (player.speed.x > 0)
+  {
+    player.renderOptions = 0;
+  }
+  if (player.speed.x < 0)
+  {
+    player.renderOptions = RENDER_OPTION_FLIP_X;
+  }
 
   // Jump
   if (just_pressed(JUMP) && player.isGrounded)
@@ -379,9 +393,19 @@ void fixed_update()
     sound_play("jump");
     player.isGrounded = false;
   }
+  if (!player.isGrounded)
+  {
+    player.animState = PLAYER_ANIM_JUMP;
+  }
 
   if (is_down(MOVE_LEFT))
   {
+    if (player.isGrounded)
+    {
+      player.animState = PLAYER_ANIM_RUN;
+    }
+    player.frameTime += dt;
+
     float mult = 1.0f;
     if (player.speed.x > 0.0f)
     {
@@ -389,8 +413,15 @@ void fixed_update()
     }
     player.speed.x = approach(player.speed.x, -runSpeed, runAcceleration * mult * dt);
   }
+
   if (is_down(MOVE_RIGHT))
   {
+    if (player.isGrounded)
+    {
+      player.animState = PLAYER_ANIM_RUN;
+    }
+    player.frameTime += dt;
+
     float mult = 1.0f;
     if (player.speed.x < 0.0f)
     {
@@ -398,7 +429,7 @@ void fixed_update()
     }
     player.speed.x = approach(player.speed.x, runSpeed, runAcceleration * mult * dt);
   }
-
+  // Drag
   if (!is_down(MOVE_LEFT) && !is_down(MOVE_RIGHT))
   {
     if (player.isGrounded)
@@ -413,6 +444,7 @@ void fixed_update()
   // Gravity
   player.speed.y = approach(player.speed.y, fallSpeed, gravity * dt);
 
+  // Reset pos
   if (is_down(MOVE_UP))
   {
     player.pos.y = {};
@@ -449,7 +481,14 @@ void draw()
   // player
   Transform &player = gameState->player;
   IVec2 playerPos = lerp(player.prevPos, player.pos, interpolatedDT);
-  draw_sprite(SPRITE_PLAYER, playerPos);
+
+  Sprite sprite = get_sprite(player.animationSprites[player.animState]);
+  int animIdx = animate_spritesheet(&player.frameTime, sprite.frameCount, 0.6f);
+  draw_sprite(player.animationSprites[player.animState], playerPos,
+              {
+                  .animationIdx = animIdx,
+                  .renderOptions = player.renderOptions
+              });
 
   // Draw tileset
   {
