@@ -389,124 +389,120 @@ void fixed_update()
   }
   if (just_pressed(DEBUG_MENU))
   {
-    ecs::Entity entitySize = world.count_alive();
-    ecs::Entity cap = world.capacity();
-
-    LOG_DEBUG("ECS\n  Number of alive entities: %d\n  Current capacity: %d", entitySize, cap);
+    world.log_entities();
   }
 
+  /*
+  Transform &player = gameState->player;
+  player.prevPos = player.pos;
 
-/*
-Transform &player = gameState->player;
-player.prevPos = player.pos;
+  player.animState = PLAYER_ANIM_IDLE;
 
-player.animState = PLAYER_ANIM_IDLE;
-
-constexpr float runSpeed = 2.0f;
-constexpr float runAcceleration = 10.0f;
-constexpr float runReduce = 22.0f;
-constexpr float flyReduce = 12.0f;
-constexpr float gravity = 13.0f;
-constexpr float fallSpeed = 3.6f;
-constexpr float jumpSpeed = -4.0f;
-// flip
-if (player.speed.x > 0)
-{
-  player.renderOptions = 0;
-}
-if (player.speed.x < 0)
-{
-  player.renderOptions = RENDER_OPTION_FLIP_X;
-}
-
-// Jump
-if (just_pressed(JUMP) && player.isGrounded)
-{
-  player.speed.y = jumpSpeed;
-
-  sound_play("jump");
-  player.isGrounded = false;
-}
-if (!player.isGrounded)
-{
-  player.animState = PLAYER_ANIM_JUMP;
-}
-
-if (is_down(MOVE_LEFT))
-{
-  if (player.isGrounded)
+  constexpr float runSpeed = 2.0f;
+  constexpr float runAcceleration = 10.0f;
+  constexpr float runReduce = 22.0f;
+  constexpr float flyReduce = 12.0f;
+  constexpr float gravity = 13.0f;
+  constexpr float fallSpeed = 3.6f;
+  constexpr float jumpSpeed = -4.0f;
+  // flip
+  if (player.speed.x > 0)
   {
-    player.animState = PLAYER_ANIM_RUN;
+    player.renderOptions = 0;
   }
-  player.frameTime += dt;
+  if (player.speed.x < 0)
+  {
+    player.renderOptions = RENDER_OPTION_FLIP_X;
+  }
 
-  float mult = 1.0f;
-  if (player.speed.x > 0.0f)
+  // Jump
+  if (just_pressed(JUMP) && player.isGrounded)
   {
-    mult = 3.0f;
-  }
-  player.speed.x = approach(player.speed.x, -runSpeed, runAcceleration * mult * dt);
-}
+    player.speed.y = jumpSpeed;
 
-if (is_down(MOVE_RIGHT))
-{
-  if (player.isGrounded)
-  {
-    player.animState = PLAYER_ANIM_RUN;
+    sound_play("jump");
+    player.isGrounded = false;
   }
-  player.frameTime += dt;
+  if (!player.isGrounded)
+  {
+    player.animState = PLAYER_ANIM_JUMP;
+  }
 
-  float mult = 1.0f;
-  if (player.speed.x < 0.0f)
+  if (is_down(MOVE_LEFT))
   {
-    mult = 3.0f;
-  }
-  player.speed.x = approach(player.speed.x, runSpeed, runAcceleration * mult * dt);
-}
-// Drag
-if (!is_down(MOVE_LEFT) && !is_down(MOVE_RIGHT))
-{
-  if (player.isGrounded)
-  {
-    player.speed.x = approach(player.speed.x, 0, runReduce * dt);
-  }
-  else
-  {
-    player.speed.x = approach(player.speed.x, 0, flyReduce * dt);
-  }
-}
-// Gravity
-player.speed.y = approach(player.speed.y, fallSpeed, gravity * dt);
+    if (player.isGrounded)
+    {
+      player.animState = PLAYER_ANIM_RUN;
+    }
+    player.frameTime += dt;
 
-// Reset pos
-if (is_down(MOVE_UP))
-{
-  player.pos.y = {};
-}
-
-if (is_down(PRIMARY))
-{
-  IVec2 mousePosWorld = input->mousePosWorld;
-  Tile *tile = get_tile(mousePosWorld);
-  if (tile)
-  {
-    tile->isVisible = true;
-    update_tiles();
+    float mult = 1.0f;
+    if (player.speed.x > 0.0f)
+    {
+      mult = 3.0f;
+    }
+    player.speed.x = approach(player.speed.x, -runSpeed, runAcceleration * mult * dt);
   }
-}
-if (is_down(SECONDARY))
-{
-  IVec2 mousePosWorld = input->mousePosWorld;
-  Tile *tile = get_tile(mousePosWorld);
-  if (tile)
-  {
-    tile->isVisible = false;
-    update_tiles();
-  }
-}
 
-Move(player);
-*/
+  if (is_down(MOVE_RIGHT))
+  {
+    if (player.isGrounded)
+    {
+      player.animState = PLAYER_ANIM_RUN;
+    }
+    player.frameTime += dt;
+
+    float mult = 1.0f;
+    if (player.speed.x < 0.0f)
+    {
+      mult = 3.0f;
+    }
+    player.speed.x = approach(player.speed.x, runSpeed, runAcceleration * mult * dt);
+  }
+  // Drag
+  if (!is_down(MOVE_LEFT) && !is_down(MOVE_RIGHT))
+  {
+    if (player.isGrounded)
+    {
+      player.speed.x = approach(player.speed.x, 0, runReduce * dt);
+    }
+    else
+    {
+      player.speed.x = approach(player.speed.x, 0, flyReduce * dt);
+    }
+  }
+  // Gravity
+  player.speed.y = approach(player.speed.y, fallSpeed, gravity * dt);
+
+  // Reset pos
+  if (is_down(MOVE_UP))
+  {
+    player.pos.y = {};
+  }
+
+  if (is_down(PRIMARY))
+  {
+    IVec2 mousePosWorld = input->mousePosWorld;
+    Tile *tile = get_tile(mousePosWorld);
+    if (tile)
+    {
+      tile->isVisible = true;
+      update_tiles();
+    }
+  }
+  if (is_down(SECONDARY))
+  {
+    IVec2 mousePosWorld = input->mousePosWorld;
+    Tile *tile = get_tile(mousePosWorld);
+    if (tile)
+    {
+      tile->isVisible = false;
+      update_tiles();
+    }
+  }
+
+  Move(player);
+  */
 }
 
 void draw()

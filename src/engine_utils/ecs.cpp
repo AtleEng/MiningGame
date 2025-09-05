@@ -202,8 +202,6 @@ namespace ecs
     {
     public:
         // -----------------------=== Entity ===-----------------------
-        EntityManager em;
-
         //? Create new entity
         Entity create_entity()
         {
@@ -261,6 +259,28 @@ namespace ecs
             }
         }
 
+        //? log all entities and their components
+        void log_entities()
+        {
+            LOG_CUSTOM("\nWorld Entity Dump", textColorGreen, "");
+
+            ecs::Entity entitySize = count_alive();
+            ecs::Entity cap = capacity();
+            LOG_CUSTOM("Number of alive entities:", textColorYellow,"% d \n Current capacity: % d", entitySize, cap);
+
+            for (Entity e = 0; e < capacity(); ++e)
+            {
+                if (!is_alive(e))
+                {
+                    continue;
+                }
+                LOG_CUSTOM("", textColorOrange, "Entity %d has:", e);
+
+                bool first = true;
+            }
+        }
+
     private:
+        EntityManager em;
     };
 }
