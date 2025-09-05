@@ -1,7 +1,8 @@
 #include "game.h"
+#include "../engine_utils/ecs.cpp"
 
 // ################################     Game Constants   ################################
-
+ecs::World world;
 // ################################     Game Structs   ################################
 
 // ################################     Game Functions   ################################
@@ -301,12 +302,14 @@ EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Inp
       gameState->keyMappings[SECONDARY].keys.add(KEY_X);
       // Other
       gameState->keyMappings[JUMP].keys.add(KEY_SPACE);
+
       gameState->keyMappings[MENU].keys.add(KEY_ESCAPE);
+      gameState->keyMappings[DEBUG_MENU].keys.add(KEY_F3);
     }
 
     // Tileset
     {
-      IVec2 tilesPosition = {0, 16};
+      IVec2 tilesPosition = {0, 64};
       for (int y = 0; y < 5; y++)
       {
         for (int x = 0; x < 4; x++)
@@ -352,6 +355,10 @@ EXPORT_FN void update_game(GameState *gameStateIn, RenderData *renderDataIn, Inp
 
 void init()
 {
+  world.add_system<ecs::MovementSystem>(world.transforms, world.velocities);
+  world.add_system<ecs::ScriptSystem>(world.scripts);
+
+  /*
   gameState->player.aabb =
       {
           8,
@@ -359,125 +366,154 @@ void init()
   gameState->player.animationSprites[PLAYER_ANIM_IDLE] = SPRITE_PLAYER;
   gameState->player.animationSprites[PLAYER_ANIM_RUN] = SPRITE_PLAYER_RUN;
   gameState->player.animationSprites[PLAYER_ANIM_JUMP] = SPRITE_PLAYER_JUMP;
+  */
 }
+
 void fixed_update()
 {
   float dt = UPDATE_DELAY;
-  Transform &player = gameState->player;
-  player.prevPos = player.pos;
 
-  player.animState = PLAYER_ANIM_IDLE;
-
-  constexpr float runSpeed = 2.0f;
-  constexpr float runAcceleration = 10.0f;
-  constexpr float runReduce = 22.0f;
-  constexpr float flyReduce = 12.0f;
-  constexpr float gravity = 13.0f;
-  constexpr float fallSpeed = 3.6f;
-  constexpr float jumpSpeed = -4.0f;
-  // flip
-  if (player.speed.x > 0)
+  if (just_pressed(PRIMARY))
   {
-    player.renderOptions = 0;
+    ecs::Entity entity = world.count_alive() - 1;
+    world.destroy_entity(entity);
+
+    LOG_DEBUG("Destroyed entity, id %d", entity);
   }
-  if (player.speed.x < 0)
+  if (just_pressed(SECONDARY))
   {
-    player.renderOptions = RENDER_OPTION_FLIP_X;
-  }
+    ecs::Entity entity = world.create_entity();
+    world.transforms.add(entity, ecs::TransformHot{0, 0});
 
-  // Jump
-  if (just_pressed(JUMP) && player.isGrounded)
-  {
-    player.speed.y = jumpSpeed;
-
-    sound_play("jump");
-    player.isGrounded = false;
+    LOG_DEBUG("Created entity, id %d", entity);
   }
-  if (!player.isGrounded)
+  if (just_pressed(DEBUG_MENU))
   {
-    player.animState = PLAYER_ANIM_JUMP;
+    ecs::Entity entitySize = world.count_alive();
+    ecs::Entity cap = world.capacity();
+
+    LOG_DEBUG("ECS\n  Number of alive entities: %d\n  Current capacity: %d", entitySize, cap);
   }
 
-  if (is_down(MOVE_LEFT))
-  {
-    if (player.isGrounded)
-    {
-      player.animState = PLAYER_ANIM_RUN;
-    }
-    player.frameTime += dt;
 
-    float mult = 1.0f;
-    if (player.speed.x > 0.0f)
-    {
-      mult = 3.0f;
-    }
-    player.speed.x = approach(player.speed.x, -runSpeed, runAcceleration * mult * dt);
-  }
+/*
+Transform &player = gameState->player;
+player.prevPos = player.pos;
 
-  if (is_down(MOVE_RIGHT))
-  {
-    if (player.isGrounded)
-    {
-      player.animState = PLAYER_ANIM_RUN;
-    }
-    player.frameTime += dt;
+player.animState = PLAYER_ANIM_IDLE;
 
-    float mult = 1.0f;
-    if (player.speed.x < 0.0f)
-    {
-      mult = 3.0f;
-    }
-    player.speed.x = approach(player.speed.x, runSpeed, runAcceleration * mult * dt);
-  }
-  // Drag
-  if (!is_down(MOVE_LEFT) && !is_down(MOVE_RIGHT))
-  {
-    if (player.isGrounded)
-    {
-      player.speed.x = approach(player.speed.x, 0, runReduce * dt);
-    }
-    else
-    {
-      player.speed.x = approach(player.speed.x, 0, flyReduce * dt);
-    }
-  }
-  // Gravity
-  player.speed.y = approach(player.speed.y, fallSpeed, gravity * dt);
+constexpr float runSpeed = 2.0f;
+constexpr float runAcceleration = 10.0f;
+constexpr float runReduce = 22.0f;
+constexpr float flyReduce = 12.0f;
+constexpr float gravity = 13.0f;
+constexpr float fallSpeed = 3.6f;
+constexpr float jumpSpeed = -4.0f;
+// flip
+if (player.speed.x > 0)
+{
+  player.renderOptions = 0;
+}
+if (player.speed.x < 0)
+{
+  player.renderOptions = RENDER_OPTION_FLIP_X;
+}
 
-  // Reset pos
-  if (is_down(MOVE_UP))
-  {
-    player.pos.y = {};
-  }
+// Jump
+if (just_pressed(JUMP) && player.isGrounded)
+{
+  player.speed.y = jumpSpeed;
 
-  if (is_down(PRIMARY))
-  {
-    IVec2 mousePosWorld = input->mousePosWorld;
-    Tile *tile = get_tile(mousePosWorld);
-    if (tile)
-    {
-      tile->isVisible = true;
-      update_tiles();
-    }
-  }
-  if (is_down(SECONDARY))
-  {
-    IVec2 mousePosWorld = input->mousePosWorld;
-    Tile *tile = get_tile(mousePosWorld);
-    if (tile)
-    {
-      tile->isVisible = false;
-      update_tiles();
-    }
-  }
+  sound_play("jump");
+  player.isGrounded = false;
+}
+if (!player.isGrounded)
+{
+  player.animState = PLAYER_ANIM_JUMP;
+}
 
-  Move(player);
+if (is_down(MOVE_LEFT))
+{
+  if (player.isGrounded)
+  {
+    player.animState = PLAYER_ANIM_RUN;
+  }
+  player.frameTime += dt;
+
+  float mult = 1.0f;
+  if (player.speed.x > 0.0f)
+  {
+    mult = 3.0f;
+  }
+  player.speed.x = approach(player.speed.x, -runSpeed, runAcceleration * mult * dt);
+}
+
+if (is_down(MOVE_RIGHT))
+{
+  if (player.isGrounded)
+  {
+    player.animState = PLAYER_ANIM_RUN;
+  }
+  player.frameTime += dt;
+
+  float mult = 1.0f;
+  if (player.speed.x < 0.0f)
+  {
+    mult = 3.0f;
+  }
+  player.speed.x = approach(player.speed.x, runSpeed, runAcceleration * mult * dt);
+}
+// Drag
+if (!is_down(MOVE_LEFT) && !is_down(MOVE_RIGHT))
+{
+  if (player.isGrounded)
+  {
+    player.speed.x = approach(player.speed.x, 0, runReduce * dt);
+  }
+  else
+  {
+    player.speed.x = approach(player.speed.x, 0, flyReduce * dt);
+  }
+}
+// Gravity
+player.speed.y = approach(player.speed.y, fallSpeed, gravity * dt);
+
+// Reset pos
+if (is_down(MOVE_UP))
+{
+  player.pos.y = {};
+}
+
+if (is_down(PRIMARY))
+{
+  IVec2 mousePosWorld = input->mousePosWorld;
+  Tile *tile = get_tile(mousePosWorld);
+  if (tile)
+  {
+    tile->isVisible = true;
+    update_tiles();
+  }
+}
+if (is_down(SECONDARY))
+{
+  IVec2 mousePosWorld = input->mousePosWorld;
+  Tile *tile = get_tile(mousePosWorld);
+  if (tile)
+  {
+    tile->isVisible = false;
+    update_tiles();
+  }
+}
+
+Move(player);
+*/
 }
 
 void draw()
 {
   float interpolatedDT = (float)(gameState->updateTimer / UPDATE_DELAY);
 
+  /*
   // player
   Transform &player = gameState->player;
   IVec2 playerPos = lerp(player.prevPos, player.pos, interpolatedDT);
@@ -485,10 +521,8 @@ void draw()
   Sprite sprite = get_sprite(player.animationSprites[player.animState]);
   int animIdx = animate_spritesheet(&player.frameTime, sprite.frameCount, 0.6f);
   draw_sprite(player.animationSprites[player.animState], playerPos,
-              {
-                  .animationIdx = animIdx,
-                  .renderOptions = player.renderOptions
-              });
+              {.animationIdx = animIdx,
+               .renderOptions = player.renderOptions});
 
   // Draw tileset
   {
@@ -503,7 +537,7 @@ void draw()
           continue;
         }
 
-        //* Draw Tile
+        //Draw Tile
 
         RenderTransform transform = {};
         // Draw the Tile around the center
@@ -515,4 +549,5 @@ void draw()
       }
     }
   }
+    */
 }

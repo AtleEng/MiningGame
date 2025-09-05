@@ -35,6 +35,7 @@ enum GameInputType
 
     // UI
     MENU,
+    DEBUG_MENU,
 
     GAME_INPUT_COUNT
 };
@@ -91,7 +92,7 @@ struct GameState
 // ################################     Game Globals   ################################
 static GameState *gameState;
 
-// ################################     Game Functions (Exposed)   ################################
+// ################################     Game Functions   ################################
 void init();
 void fixed_update();
 void draw();
